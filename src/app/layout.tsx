@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'RepurposeFlow — Превратите 1 подкаст или созвон в 15 публикаций за 3 минуты',
   description:
-    'Медиа-комбайн на базе Google Gemini 2.0. Автоматическая дистрибуция контента в LinkedIn, VC.ru, Reels, Telegram и Email.',
+    'Медиа-комбайн на базе Google Gemini. Автоматическая дистрибуция контента в LinkedIn, VC.ru, Reels, Telegram и Email.',
   icons: {
     icon: '/favicon.ico',
   },
