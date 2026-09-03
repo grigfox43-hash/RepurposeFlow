@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   Plus,
@@ -41,11 +41,31 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLangMenuOpen(false);
+        setWorkspaceMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const minutesLeft = Math.max(0, user.minutesTotal - user.minutesUsed);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#0A0A12]/80 backdrop-blur-2xl transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      {(langMenuOpen || workspaceMenuOpen) && (
+        <div
+          className="fixed inset-0 z-30"
+          onClick={() => {
+            setLangMenuOpen(false);
+            setWorkspaceMenuOpen(false);
+          }}
+        />
+      )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 relative z-40">
         {/* Left side: Brand Logo + Section Nav */}
         <div className="flex items-center gap-6">
           <button

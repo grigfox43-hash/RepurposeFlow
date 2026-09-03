@@ -246,55 +246,96 @@ Gemini processes that raw conversation in 3 minutes:
           {t.heroSubtitle}
         </p>
 
-        {/* 3.3 Mastering Flow Deck (Process Step Cards) */}
-        <div className="step-card my-10 max-w-4xl mx-auto rounded-3xl bg-[#12121C]/90 border border-white/[0.08] shadow-2xl p-6 relative overflow-hidden backdrop-blur-2xl group hover:border-purple-500/40 transition-all duration-300">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
-            {/* Input Module */}
-            <div className="flex items-center gap-3 bg-[#0A0A12] px-4 py-3.5 rounded-2xl border border-white/[0.08] w-full lg:w-auto text-left shadow-inner">
-              <div className="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0">
+        {/* 3.3 Mastering Flow Deck (Pipeline Architecture) */}
+        <div className="step-card my-12 max-w-5xl mx-auto rounded-3xl bg-gradient-to-b from-[#141422] to-[#0D0D18] border border-white/[0.1] shadow-2xl p-6 sm:p-7 relative overflow-hidden backdrop-blur-2xl group hover:border-purple-500/40 transition-all duration-300">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-purple-500/10 blur-3xl pointer-events-none rounded-full" />
+
+          {/* Top Telemetry Bar */}
+          <div className="flex items-center justify-between pb-4 mb-5 border-b border-white/[0.06] text-left">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#B4FF39] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#B4FF39]" />
+              </span>
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-300">
+                Pipeline Architecture // 1 Запись ➔ 15 Публикаций
+              </span>
+            </div>
+            <span className="text-[10px] font-mono font-bold text-[#9B5DE5] px-2.5 py-0.5 rounded-full bg-purple-950/60 border border-purple-800/40 hidden sm:inline-block">
+              GEMINI MULTIMODAL CORE
+            </span>
+          </div>
+
+          {/* Pipeline Stages Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-11 items-center gap-3 relative z-10">
+            {/* Stage 1: Input (cols 3) */}
+            <div className="lg:col-span-3 h-full p-4 rounded-2xl bg-[#0A0A12] border border-white/[0.08] flex items-center gap-3.5 hover:border-purple-500/30 transition-all shadow-inner group/stage">
+              <div className="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0 group-hover/stage:scale-105 transition-transform">
                 <FileAudio className="w-5 h-5 text-[#9B5DE5]" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                  <span>Аудио / Видео</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#B4FF39] animate-pulse" />
+              <div className="text-left min-w-0">
+                <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <span className="truncate">Аудио / Видео</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#B4FF39] shrink-0 animate-pulse" />
                 </div>
-                <div className="text-[11px] text-slate-400 font-mono mt-0.5">MP3 • WAV • MP4 • Zoom</div>
+                <div className="text-[11px] text-slate-400 font-mono mt-0.5 truncate">
+                  MP3 • WAV • MP4 • Zoom
+                </div>
               </div>
             </div>
 
-            {/* Central Gemini Transformer Rack with Pulse */}
-            <div className="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#4C6EF5]/20 via-[#12121C] to-[#9B5DE5]/20 border border-purple-500/40 text-xs shadow-lg shadow-purple-500/10">
-              <Activity className="w-4 h-4 text-[#9B5DE5] animate-pulse" />
-              <div className="text-left">
-                <div className="font-bold text-white flex items-center gap-1.5">
-                  <span className="text-gradient-ai">Gemini</span>
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">
+            {/* Connector 1 (cols 1) */}
+            <div className="lg:col-span-1 flex items-center justify-center py-1 lg:py-0">
+              <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#9B5DE5] shadow-sm">
+                <ArrowRight className="w-4 h-4 animate-pulse rotate-90 lg:rotate-0" />
+              </div>
+            </div>
+
+            {/* Stage 2: Central AI Transformer (cols 3) */}
+            <div className="lg:col-span-3 h-full p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 via-[#121220] to-indigo-950/40 border border-purple-500/40 flex items-center gap-3.5 shadow-lg shadow-purple-500/10 hover:border-purple-400/60 transition-all group/stage">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4C6EF5]/30 to-[#9B5DE5]/30 border border-purple-500/50 flex items-center justify-center shrink-0 group-hover/stage:scale-105 transition-transform">
+                <Activity className="w-5 h-5 text-[#9B5DE5] animate-pulse" />
+              </div>
+              <div className="text-left min-w-0">
+                <div className="font-bold text-white flex items-center gap-1.5 flex-wrap">
+                  <span className="text-gradient-ai text-sm">Gemini</span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500/25 text-purple-300 border border-purple-500/40 font-mono font-bold">
                     MULTIMODAL
                   </span>
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono">180 сек транскрибация</div>
+                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                  180 сек транскрибация
+                </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-[#9B5DE5] animate-pulse ml-1" />
             </div>
 
-            {/* Output Channel Chips */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 w-full lg:w-auto">
-              {[
-                { name: 'LinkedIn', color: 'hover:border-blue-400 hover:text-blue-300' },
-                { name: 'VC.ru', color: 'hover:border-cyan-400 hover:text-cyan-300' },
-                { name: 'Reels', color: 'hover:border-purple-400 hover:text-purple-300' },
-                { name: 'Telegram', color: 'hover:border-sky-400 hover:text-sky-300' },
-                { name: 'Email', color: 'hover:border-amber-400 hover:text-amber-300' },
-                { name: 'Quotes', color: 'hover:border-pink-400 hover:text-pink-300' }
-              ].map((pill, idx) => (
-                <span
-                  key={idx}
-                  className={`text-[11px] font-bold px-3 py-1.5 rounded-xl bg-white/[0.04] text-slate-300 border border-white/[0.08] transition-all duration-200 hover:scale-105 cursor-default ${pill.color}`}
-                >
-                  {pill.name}
-                </span>
-              ))}
+            {/* Connector 2 (cols 1) */}
+            <div className="lg:col-span-1 flex items-center justify-center py-1 lg:py-0">
+              <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#F15BB5] shadow-sm">
+                <ArrowRight className="w-4 h-4 animate-pulse rotate-90 lg:rotate-0" />
+              </div>
+            </div>
+
+            {/* Stage 3: Multi-channel Output Grid 2x3 (cols 3) */}
+            <div className="lg:col-span-3 h-full p-3 rounded-2xl bg-[#0A0A12] border border-white/[0.08] shadow-inner flex items-center">
+              <div className="grid grid-cols-3 gap-1.5 w-full">
+                {[
+                  { name: 'LinkedIn', dot: 'bg-blue-400', hover: 'hover:border-blue-400/50 hover:text-blue-300' },
+                  { name: 'VC.ru', dot: 'bg-cyan-400', hover: 'hover:border-cyan-400/50 hover:text-cyan-300' },
+                  { name: 'Reels', dot: 'bg-[#F15BB5]', hover: 'hover:border-pink-400/50 hover:text-pink-300' },
+                  { name: 'Telegram', dot: 'bg-sky-400', hover: 'hover:border-sky-400/50 hover:text-sky-300' },
+                  { name: 'Email', dot: 'bg-amber-400', hover: 'hover:border-amber-400/50 hover:text-amber-300' },
+                  { name: 'Quotes', dot: 'bg-emerald-400', hover: 'hover:border-emerald-400/50 hover:text-emerald-300' }
+                ].map((pill, idx) => (
+                  <div
+                    key={idx}
+                    className={`px-2 py-1.5 rounded-xl bg-white/[0.04] text-slate-300 border border-white/[0.06] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-[1.04] cursor-default ${pill.hover}`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${pill.dot} shrink-0`} />
+                    <span className="truncate">{pill.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -682,29 +723,34 @@ Gemini processes that raw conversation in 3 minutes:
             { q: t.faq2Q, a: t.faq2A },
             { q: t.faq3Q, a: t.faq3A },
             { q: t.faq4Q, a: t.faq4A }
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="rounded-2xl bg-[#12121C] border border-white/[0.06] hover:border-white/[0.15] transition-all overflow-hidden"
-            >
-              <button
-                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4 focus:outline-none transition-colors"
+          ].map((item, idx) => {
+            const isOpen = openFaq === idx;
+            return (
+              <div
+                key={idx}
+                className="rounded-2xl bg-[#12121C] border border-white/[0.06] hover:border-white/[0.15] transition-all overflow-hidden"
               >
-                <span className="text-sm font-semibold text-white">{item.q}</span>
-                <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
-                    openFaq === idx ? 'rotate-180 text-[#9B5DE5]' : ''
-                  }`}
-                />
-              </button>
-              {openFaq === idx && (
-                <div className="px-6 pb-5 text-xs sm:text-sm text-slate-300/90 leading-relaxed border-t border-white/[0.04] pt-3 animate-fade-in">
-                  {item.a}
+                <button
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4 focus:outline-none transition-colors"
+                >
+                  <span className="text-sm font-semibold text-white">{item.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
+                      isOpen ? 'rotate-180 text-[#9B5DE5]' : ''
+                    }`}
+                  />
+                </button>
+                <div className={`faq-content ${isOpen ? 'is-open' : ''}`}>
+                  <div className="faq-content-inner">
+                    <div className="px-6 pb-5 pt-3 text-xs sm:text-sm text-slate-300/90 leading-relaxed border-t border-white/[0.04]">
+                      {item.a}
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       </section>
 

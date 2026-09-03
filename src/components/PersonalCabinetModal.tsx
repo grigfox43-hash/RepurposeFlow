@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   User,
@@ -80,6 +80,16 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
   const [cabinetApiKey, setCabinetApiKey] = useState(
     typeof window !== 'undefined' ? localStorage.getItem('custom_gemini_api_key') || '' : ''
   );
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -230,8 +240,16 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
   // -------------------------------------------------------------
   if (!user.isAuthenticated) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in">
-        <div className="relative w-full max-w-md rounded-3xl bg-[#12121C] border border-white/[0.1] shadow-2xl p-6 sm:p-8 text-left animate-modal">
+      <div
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in cursor-pointer"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-md rounded-3xl bg-[#12121C] border border-white/[0.1] shadow-2xl p-6 sm:p-8 text-left animate-modal cursor-default"
+        >
           {/* Close button */}
           <button
             onClick={onClose}
@@ -367,8 +385,16 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
   // 2. IF LOGGED IN: Render Full-Featured Personal Cabinet Dashboard
   // -------------------------------------------------------------
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-[#12121C] border border-white/[0.1] shadow-2xl p-6 sm:p-8 my-8 text-left max-h-[90vh] overflow-y-auto animate-modal">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl rounded-3xl bg-[#12121C] border border-white/[0.1] shadow-2xl p-6 sm:p-8 my-8 text-left max-h-[90vh] overflow-y-auto animate-modal cursor-default"
+      >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-3.5">
