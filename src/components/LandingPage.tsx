@@ -107,10 +107,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onSelectPlan 
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs font-medium text-slate-300 mb-8 shadow-inner animate-in fade-in slide-in-from-bottom-3 duration-500">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-white font-semibold">RepurposeFlow 2.0</span>
+          <span className="text-white font-semibold">RepurposeFlow 2.5</span>
           <span className="text-slate-500">•</span>
           <span className="text-indigo-300 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-emerald-400" /> Мультимодальный Google Gemini
+            <Sparkles className="w-3 h-3 text-emerald-400" /> Мультимодальный Google Gemini 2.5
           </span>
         </div>
 

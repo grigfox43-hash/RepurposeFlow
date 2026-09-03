@@ -47,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg tracking-tight text-white font-sans">Repurpose<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-300 to-emerald-400">Flow</span></span>
                 <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 flex items-center gap-1">
-                  <Sparkles className="w-2.5 h-2.5 text-emerald-400" /> Gemini 2.0
+                  <Sparkles className="w-2.5 h-2.5 text-emerald-400" /> Gemini 2.5
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 hidden sm:block">1 запись ➔ 15 постов за 3 мин</p>

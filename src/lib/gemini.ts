@@ -217,8 +217,10 @@ ${TONE_PROMPTS[tone]}
 
 Каждый текст должен быть полностью завершенным, с хуками, эмодзи (где уместно), структурными абзацами и призывами к действию (CTA).`;
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+  // Try gemini-2.5-flash first (the newest Google Gemini generation), with fallback to gemini-2.0-flash
+  const targetModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  let response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -231,6 +233,24 @@ ${TONE_PROMPTS[tone]}
       })
     }
   );
+
+  if (!response.ok && targetModel !== 'gemini-2.0-flash') {
+    // Fallback to gemini-2.0-flash
+    response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            responseMimeType: 'application/json'
+          }
+        })
+      }
+    );
+  }
 
   if (!response.ok) {
     throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);

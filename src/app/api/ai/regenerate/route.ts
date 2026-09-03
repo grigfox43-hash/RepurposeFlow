@@ -25,8 +25,9 @@ ${originalContent}
 
 Верни только готовый отредактированный Markdown текст без лишних вступительных фраз.`;
 
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        const targetModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+        let response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -36,6 +37,20 @@ ${originalContent}
             })
           }
         );
+
+        if (!response.ok && targetModel !== 'gemini-2.0-flash') {
+          response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7 }
+              })
+            }
+          );
+        }
 
         if (response.ok) {
           const data = await response.json();
