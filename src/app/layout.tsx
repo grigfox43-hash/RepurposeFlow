@@ -1,15 +1,23 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Space_Grotesk, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-heading',
   subsets: ['latin'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+const inter = Inter({
+  variable: '--font-body',
+  subsets: ['latin', 'cyrillic'],
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
+  subsets: ['latin', 'cyrillic'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -29,8 +37,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={`${geistSans.variable} ${geistMono.variable} dark`}>
-      <body className="bg-slate-950 text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white antialiased">
+    <html
+      lang="ru"
+      className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} dark`}
+    >
+      <body className="bg-[#0A0A12] text-[#F5F5FA] min-h-screen selection:bg-[#9B5DE5] selection:text-white antialiased">
         {children}
       </body>
     </html>

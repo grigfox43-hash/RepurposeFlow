@@ -9,6 +9,7 @@ import { ProcessingState } from '@/components/ProcessingState';
 import { StudioEditor } from '@/components/StudioEditor';
 import { SettingsModal } from '@/components/SettingsModal';
 import { PersonalCabinetModal } from '@/components/PersonalCabinetModal';
+import { RedesignEffects } from '@/components/RedesignEffects';
 import { LanguageProvider } from '@/context/LanguageContext';
 import {
   getStoredJobs,
@@ -159,7 +160,8 @@ function AppContent() {
   const userJobsCount = jobs.filter((j) => !j.userId || j.userId === user.id).length;
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 font-sans">
+    <div className="min-h-screen bg-[#0A0A12] text-[#F5F5FA] font-sans">
+      <RedesignEffects />
       <Navbar
         currentView={currentView}
         onNavigate={(view) => {

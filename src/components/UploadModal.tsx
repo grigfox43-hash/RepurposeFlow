@@ -54,7 +54,23 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
   if (!isOpen) return null;
 
-  const minutesLeft = Math.max(0, user.minutesTotal - user.minutesUsed);
+  const toggleFormat = (formatKey: FormatType) => {
+    if (selectedFormats.includes(formatKey)) {
+      if (selectedFormats.length > 1) {
+        setSelectedFormats(selectedFormats.filter((f) => f !== formatKey));
+      }
+    } else {
+      setSelectedFormats([...selectedFormats, formatKey]);
+    }
+  };
+
+  const toggleAllFormats = () => {
+    if (selectedFormats.length === ALL_FORMAT_KEYS.length) {
+      setSelectedFormats(['linkedin_thread']);
+    } else {
+      setSelectedFormats([...ALL_FORMAT_KEYS]);
+    }
+  };
 
   const handleFileDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -63,7 +79,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
       const file = e.dataTransfer.files[0];
       setSelectedFile(file);
       if (!title) {
-        setTitle(file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '));
+        setTitle(file.name.replace(/\.[^/.]+$/, ''));
       }
     }
   };
@@ -73,49 +89,45 @@ export const UploadModal: React.FC<UploadModalProps> = ({
       const file = e.target.files[0];
       setSelectedFile(file);
       if (!title) {
-        setTitle(file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' '));
+        setTitle(file.name.replace(/\.[^/.]+$/, ''));
       }
-    }
-  };
-
-  const toggleFormat = (fmt: FormatType) => {
-    setSelectedFormats((prev) =>
-      prev.includes(fmt) ? prev.filter((f) => f !== fmt) : [...prev, fmt]
-    );
-  };
-
-  const toggleAllFormats = () => {
-    if (selectedFormats.length === ALL_FORMAT_KEYS.length) {
-      setSelectedFormats([]);
-    } else {
-      setSelectedFormats([...ALL_FORMAT_KEYS]);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    if (sourceType === 'file' && !selectedFile) return;
-    if (sourceType === 'youtube' && !youtubeUrl.trim()) return;
+    if (sourceType === 'file' && !selectedFile) {
+      alert('Пожалуйста, выберите файл для загрузки');
+      return;
+    }
+    if (sourceType === 'youtube' && !youtubeUrl.trim()) {
+      alert('Пожалуйста, введите корректную ссылку на YouTube');
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
-      let fileUrl = '';
+      let mediaUrl = '';
+      let storagePath = '';
+
       if (sourceType === 'file' && selectedFile) {
-        const presignRes = await fetch('/api/upload/presign', {
+        // Upload to local mock storage
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const uploadRes = await fetch('/api/upload/storage', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            filename: selectedFile.name,
-            sizeBytes: selectedFile.size
-          })
+          body: formData
         });
-        const presignData = await presignRes.json();
-        fileUrl = presignData.publicUrl || '';
+        const uploadData = await uploadRes.json();
+        mediaUrl = uploadData.url || `/uploads/${selectedFile.name}`;
+        storagePath = uploadData.path || selectedFile.name;
+      } else {
+        mediaUrl = youtubeUrl;
       }
 
-      const durationSeconds = estimatedDurationMin * 60;
+      // Create and dispatch job to Gemini API
       const jobRes = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,10 +135,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           userId: user.id,
           workspaceId: activeWorkspaceId,
           title: title.trim(),
-          sourceType: sourceType === 'file' ? 'file_upload' : 'youtube',
-          fileName: selectedFile?.name || (sourceType === 'youtube' ? youtubeUrl : 'Uploaded Media'),
-          fileUrl,
-          durationSeconds,
+          sourceType,
+          mediaUrl,
+          storagePath,
+          durationSeconds: estimatedDurationMin * 60,
           language,
           tone,
           formats: selectedFormats,
@@ -151,16 +163,16 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-3xl rounded-3xl bg-[#080C14] border border-white/[0.1] shadow-2xl p-6 sm:p-8 my-8 text-left max-h-[90vh] overflow-y-auto animate-modal">
+      <div className="relative w-full max-w-3xl rounded-3xl bg-[#12121C] border border-white/[0.1] shadow-2xl p-6 sm:p-8 my-8 text-left max-h-[90vh] overflow-y-auto animate-modal">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-              <Zap className="w-5 h-5 text-cyan-400" />
+            <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-[#9B5DE5]" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white tracking-tight">{t.uploadModalTitle}</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-xl font-bold text-white tracking-tight font-heading">{t.uploadModalTitle}</h2>
+              <p className="text-xs text-[#9A9AB0]">
                 {t.uploadModalSubtitle}
               </p>
             </div>
@@ -185,11 +197,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 onClick={() => setSourceType('file')}
                 className={`py-3 px-4 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition ${
                   sourceType === 'file'
-                    ? 'bg-cyan-500/15 border-cyan-500/50 text-white'
-                    : 'bg-[#030712] border-white/[0.07] text-slate-400 hover:border-white/[0.15]'
+                    ? 'bg-purple-500/15 border-purple-500/50 text-white'
+                    : 'bg-[#0A0A12] border-white/[0.07] text-slate-400 hover:border-white/[0.15]'
                 }`}
               >
-                <FileAudio className="w-4 h-4 text-cyan-400" />
+                <FileAudio className="w-4 h-4 text-[#9B5DE5]" />
                 <span>{t.uploadSourceFile}</span>
               </button>
               <button
@@ -197,11 +209,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 onClick={() => setSourceType('youtube')}
                 className={`py-3 px-4 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition ${
                   sourceType === 'youtube'
-                    ? 'bg-cyan-500/15 border-cyan-500/50 text-white'
-                    : 'bg-[#030712] border-white/[0.07] text-slate-400 hover:border-white/[0.15]'
+                    ? 'bg-purple-500/15 border-purple-500/50 text-white'
+                    : 'bg-[#0A0A12] border-white/[0.07] text-slate-400 hover:border-white/[0.15]'
                 }`}
               >
-                <Video className="w-4 h-4 text-red-400" />
+                <Video className="w-4 h-4 text-[#F15BB5]" />
                 <span>{t.uploadSourceUrl}</span>
               </button>
             </div>
@@ -217,10 +229,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 onDrop={handleFileDrop}
                 className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all relative ${
                   dragActive
-                    ? 'border-cyan-500 bg-cyan-950/20'
+                    ? 'border-purple-500 bg-purple-950/20'
                     : selectedFile
                     ? 'border-emerald-500/50 bg-emerald-950/10'
-                    : 'border-white/[0.08] bg-[#030712]/60 hover:border-white/[0.2]'
+                    : 'border-white/[0.08] bg-[#0A0A12]/60 hover:border-white/[0.2]'
                 }`}
               >
                 <input
@@ -234,8 +246,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                   htmlFor="media-file-input"
                   className="cursor-pointer flex flex-col items-center justify-center"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-3">
-                    <UploadCloud className="w-6 h-6 text-cyan-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-3">
+                    <UploadCloud className="w-6 h-6 text-[#9B5DE5]" />
                   </div>
                   {selectedFile ? (
                     <div>
@@ -251,7 +263,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                       <span className="text-sm font-semibold text-white block">
                         {t.uploadDragDropDefault}
                       </span>
-                      <span className="text-xs text-slate-400 mt-1 block">
+                      <span className="text-xs text-[#9A9AB0] mt-1 block">
                         {t.uploadDragDropLimits}
                       </span>
                     </div>
@@ -270,7 +282,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                       setTitle('YouTube Recording');
                     }
                   }}
-                  className="w-full px-4 py-3 rounded-xl bg-[#030712] border border-white/[0.08] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500"
+                  className="w-full px-4 py-3 rounded-xl bg-[#0A0A12] border border-white/[0.08] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-500 transition-colors"
                 />
                 <p className="text-[11px] text-slate-500">
                   {t.uploadUrlHint}
@@ -291,7 +303,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-cyan-500"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#0A0A12] border border-white/[0.08] text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
             <div>
@@ -304,7 +316,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                 max={240}
                 value={estimatedDurationMin}
                 onChange={(e) => setEstimatedDurationMin(Number(e.target.value))}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white font-mono text-sm focus:outline-none focus:border-cyan-500"
+                className="w-full px-3 py-2.5 rounded-xl bg-[#0A0A12] border border-white/[0.08] text-white font-mono text-sm focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
           </div>
@@ -313,12 +325,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-cyan-400" /> {t.uploadLanguage}
+                <Globe className="w-3.5 h-3.5 text-[#4C6EF5]" /> {t.uploadLanguage}
               </label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A12] border border-white/[0.08] text-white text-xs focus:outline-none focus:border-purple-500 transition-colors"
               >
                 <option value="ru">{t.uploadLangRu}</option>
                 <option value="en">{t.uploadLangEn}</option>
@@ -328,12 +340,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-indigo-400" /> {t.uploadTone}
+                <Sliders className="w-3.5 h-3.5 text-[#9B5DE5]" /> {t.uploadTone}
               </label>
               <select
                 value={tone}
                 onChange={(e) => setTone(e.target.value as ToneOfVoice)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white text-xs focus:outline-none focus:border-cyan-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A12] border border-white/[0.08] text-white text-xs focus:outline-none focus:border-purple-500 transition-colors"
               >
                 <option value="b2b_expert">{t.uploadToneB2B}</option>
                 <option value="provocative_founder">{t.uploadToneFounder}</option>
@@ -352,7 +364,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               <button
                 type="button"
                 onClick={toggleAllFormats}
-                className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold"
+                className="text-[11px] text-[#9B5DE5] hover:text-purple-300 font-semibold"
               >
                 {selectedFormats.length === ALL_FORMAT_KEYS.length
                   ? t.uploadFormatsDeselectAll
@@ -360,7 +372,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-[#030712] rounded-2xl border border-white/[0.07]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 bg-[#0A0A12] rounded-2xl border border-white/[0.07]">
               {ALL_FORMAT_KEYS.map((fmtKey) => {
                 const isSelected = selectedFormats.includes(fmtKey);
                 const meta = FORMAT_DEFINITIONS[fmtKey];
@@ -371,14 +383,14 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     onClick={() => toggleFormat(fmtKey)}
                     className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs transition ${
                       isSelected
-                        ? 'bg-cyan-500/20 text-white border border-cyan-500/40'
+                        ? 'bg-purple-500/20 text-white border border-purple-500/40'
                         : 'text-slate-400 hover:bg-white/[0.04] border border-transparent'
                     }`}
                   >
                     <div
                       className={`w-4 h-4 rounded flex items-center justify-center border ${
                         isSelected
-                          ? 'bg-cyan-500 border-cyan-400 text-black'
+                          ? 'bg-[#9B5DE5] border-purple-400 text-white'
                           : 'border-slate-700 bg-slate-900'
                       }`}
                     >
@@ -392,8 +404,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           </div>
 
           {/* Processing notice */}
-          <div className="p-3.5 rounded-2xl bg-[#030712] border border-white/[0.07] flex items-center gap-2.5 text-xs text-slate-400">
-            <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 animate-pulse" />
+          <div className="p-3.5 rounded-2xl bg-[#0A0A12] border border-white/[0.07] flex items-center gap-2.5 text-xs text-[#9A9AB0]">
+            <Sparkles className="w-4 h-4 text-[#F15BB5] shrink-0 animate-pulse" />
             <span>Пакетная генерация 15 форматов на базе мультимодального Gemini</span>
           </div>
 
@@ -409,7 +421,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting || !title.trim()}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white text-xs font-bold shadow-lg shadow-cyan-500/30 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="btn-primary-effect btn-cta-pulse px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#4C6EF5] via-[#9B5DE5] to-[#F15BB5] text-white text-xs font-bold shadow-lg shadow-purple-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Zap className="w-4 h-4" />
               <span>{isSubmitting ? t.uploadSubmitting : t.uploadSubmit}</span>
