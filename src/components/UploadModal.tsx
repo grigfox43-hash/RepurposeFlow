@@ -129,7 +129,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           durationSeconds,
           language,
           tone,
-          formats: selectedFormats
+          formats: selectedFormats,
+          apiKey: typeof window !== 'undefined' ? localStorage.getItem('custom_gemini_api_key') || undefined : undefined
         })
       });
 

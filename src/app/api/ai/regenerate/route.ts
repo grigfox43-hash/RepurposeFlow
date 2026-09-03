@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
+import { DEFAULT_GEMINI_API_KEY } from '@/lib/gemini';
 
 export async function POST(req: Request) {
   try {
-    const { originalContent, instruction, tone = 'b2b_expert' } = await req.json();
+    const { originalContent, instruction, tone = 'b2b_expert', apiKey: customApiKey } = await req.json();
 
     if (!originalContent) {
       return NextResponse.json({ error: 'Original content is required' }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey = customApiKey?.trim() || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || DEFAULT_GEMINI_API_KEY;
 
     if (apiKey) {
       try {

@@ -84,6 +84,12 @@ export interface Workspace {
   jobsCount: number;
 }
 
+export interface UserPreferences {
+  defaultTone?: ToneOfVoice;
+  defaultLanguage?: 'ru' | 'en' | 'auto';
+  themeColor?: 'cyan' | 'purple' | 'emerald' | 'amber';
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -95,6 +101,8 @@ export interface UserProfile {
   workspaces: Workspace[];
   activeWorkspaceId: string;
   isAuthenticated?: boolean;
+  preferences?: UserPreferences;
+  createdAt?: string;
 }
 
 export interface PlanDetails {

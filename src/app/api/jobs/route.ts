@@ -16,7 +16,8 @@ export async function POST(req: Request) {
       language = 'ru',
       tone = 'b2b_expert',
       formats = ['linkedin_thread', 'vc_article', 'reels_scripts', 'telegram_digest', 'newsletter', 'quotes'],
-      workspaceId = 'ws-personal'
+      workspaceId = 'ws-personal',
+      apiKey: customApiKey
     } = body;
 
     if (!title) {
@@ -51,12 +52,13 @@ export async function POST(req: Request) {
       }
     }
 
-    // Call Gemini processor directly
+    // Call Gemini processor directly with default or custom key
     const { contentItems, transcript } = await generateContentWithGemini({
       title,
       tone: tone as ToneOfVoice,
       formats: formats as FormatType[],
-      language
+      language,
+      apiKey: customApiKey
     });
 
     const job: MediaJob = {

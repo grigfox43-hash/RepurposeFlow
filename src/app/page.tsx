@@ -32,7 +32,12 @@ function AppContent() {
 
   // Load jobs from real database API on mount
   useEffect(() => {
-    setUser(getStoredUser());
+    const loadedUser = getStoredUser();
+    setUser(loadedUser);
+    if (loadedUser.isAuthenticated) {
+      setCurrentView('dashboard');
+    }
+
     const loadFromDb = async () => {
       try {
         const res = await fetch('/api/db/jobs');
@@ -62,17 +67,39 @@ function AppContent() {
     loadFromDb();
   }, []);
 
+  // Enforce authentication gate: guest users cannot access dashboard or studio directly
+  const requireAuth = (action: () => void) => {
+    if (!user.isAuthenticated) {
+      setIsCabinetOpen(true);
+      return;
+    }
+    action();
+  };
+
   const handleUpdateUser = (updatedUser: UserProfile) => {
+    const wasGuest = !user.isAuthenticated;
     setUser(updatedUser);
     saveStoredUser(updatedUser);
+
+    // If user just registered / signed in, redirect straight into the personal dashboard
+    if (wasGuest && updatedUser.isAuthenticated) {
+      setCurrentView('dashboard');
+    }
   };
 
   const handleSwitchUser = (newUser: UserProfile) => {
     setUser(newUser);
     saveStoredUser(newUser);
-    // Find first job belonging to this user
+
+    if (!newUser.isAuthenticated) {
+      setCurrentView('landing');
+      setActiveJob(null);
+      return;
+    }
+
     const userFirstJob = jobs.find((j) => !j.userId || j.userId === newUser.id);
     setActiveJob(userFirstJob || null);
+    setCurrentView('dashboard');
   };
 
   const handleUpdateJobs = (updatedJobs: MediaJob[]) => {
@@ -92,12 +119,6 @@ function AppContent() {
   const handleJobStarted = (newJob: MediaJob) => {
     const updatedJobs = [newJob, ...jobs];
     handleUpdateJobs(updatedJobs);
-
-    const updatedUser = {
-      ...user,
-      minutesUsed: user.minutesUsed + (newJob.minutesCharged || 30)
-    };
-    handleUpdateUser(updatedUser);
 
     setActiveJob(newJob);
     setIsProcessing(true);
@@ -142,17 +163,23 @@ function AppContent() {
       <Navbar
         currentView={currentView}
         onNavigate={(view) => {
-          if (view === 'studio' && !activeJob && jobs.length > 0) {
-            const userJob = jobs.find((j) => !j.userId || j.userId === user.id) || jobs[0];
-            setActiveJob(userJob);
+          if (view === 'landing') {
+            setCurrentView('landing');
+          } else {
+            requireAuth(() => {
+              if (view === 'studio' && !activeJob && jobs.length > 0) {
+                const userJob = jobs.find((j) => !j.userId || j.userId === user.id) || jobs[0];
+                setActiveJob(userJob);
+              }
+              setCurrentView(view);
+            });
           }
-          setCurrentView(view);
         }}
         user={user}
         activeWorkspace={activeWorkspace}
         onSelectWorkspace={handleSelectWorkspace}
-        onOpenUpload={() => setIsUploadOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenUpload={() => requireAuth(() => setIsUploadOpen(true))}
+        onOpenSettings={() => requireAuth(() => setIsSettingsOpen(true))}
         onOpenCabinet={() => setIsCabinetOpen(true)}
       />
 
@@ -160,30 +187,32 @@ function AppContent() {
         {currentView === 'landing' && (
           <LandingPage
             onStart={() => {
-              if (jobs.length > 0) {
-                const userJob = jobs.find((j) => !j.userId || j.userId === user.id) || jobs[0];
-                setActiveJob(userJob);
-                setCurrentView('studio');
-              } else {
-                setCurrentView('dashboard');
-              }
+              requireAuth(() => {
+                if (jobs.length > 0) {
+                  const userJob = jobs.find((j) => !j.userId || j.userId === user.id) || jobs[0];
+                  setActiveJob(userJob);
+                  setCurrentView('studio');
+                } else {
+                  setCurrentView('dashboard');
+                }
+              });
             }}
           />
         )}
 
-        {currentView === 'dashboard' && (
+        {currentView === 'dashboard' && user.isAuthenticated && (
           <Dashboard
             user={user}
             activeWorkspace={activeWorkspace}
             jobs={jobs}
-            onOpenUpload={() => setIsUploadOpen(true)}
+            onOpenUpload={() => requireAuth(() => setIsUploadOpen(true))}
             onOpenStudio={handleOpenStudio}
             onDeleteJob={handleDeleteJob}
             onOpenCabinet={() => setIsCabinetOpen(true)}
           />
         )}
 
-        {currentView === 'studio' && (
+        {currentView === 'studio' && user.isAuthenticated && (
           <div>
             {isProcessing && activeJob ? (
               <ProcessingState job={activeJob} onComplete={handleJobCompleted} />

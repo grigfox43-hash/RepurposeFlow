@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Key, Sparkles, Check, Server, Shield, ExternalLink, Database } from 'lucide-react';
+import { X, Key, Sparkles, Check, Server, Shield, ExternalLink, Database, RotateCcw } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -24,10 +24,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
   if (!isOpen) return null;
 
+  const handleResetToDefault = () => {
+    setGeminiApiKey('');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('custom_gemini_api_key');
+    }
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (typeof window !== 'undefined') {
-      localStorage.setItem('custom_gemini_api_key', geminiApiKey.trim());
+      if (geminiApiKey.trim()) {
+        localStorage.setItem('custom_gemini_api_key', geminiApiKey.trim());
+      } else {
+        localStorage.removeItem('custom_gemini_api_key');
+      }
       localStorage.setItem('custom_n8n_webhook', n8nWebhookUrl.trim());
       localStorage.setItem('custom_s3_bucket', s3Bucket.trim());
     }
@@ -35,8 +46,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setTimeout(() => {
       setSavedSuccess(false);
       onClose();
-    }, 1200);
+    }, 1000);
   };
+
+  const isCustomKeyActive = Boolean(geminiApiKey.trim());
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
@@ -62,28 +75,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <form onSubmit={handleSave} className="mt-6 space-y-5">
           {/* Gemini API Key */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Gemini API Key:
-              </span>
-              <a
-                href="https://aistudio.google.com/app/apikey"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-              >
-                AI Studio <ExternalLink className="w-2.5 h-2.5" />
-              </a>
-            </label>
+              </label>
+              <div className="flex items-center gap-2">
+                {isCustomKeyActive ? (
+                  <button
+                    type="button"
+                    onClick={handleResetToDefault}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    <RotateCcw className="w-2.5 h-2.5" /> Сбросить на системный
+                  </button>
+                ) : (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/40 font-mono flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Системный ключ активен
+                  </span>
+                )}
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                >
+                  AI Studio <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              </div>
+            </div>
+
             <input
               type="password"
-              placeholder="AQ... или AIza..."
+              placeholder={isCustomKeyActive ? 'Ваш персональный ключ' : 'Используется системный ключ по умолчанию (AQ.Ab8RN6...)'}
               value={geminiApiKey}
               onChange={(e) => setGeminiApiKey(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white font-mono text-xs focus:outline-none focus:border-cyan-500"
+              className={`w-full px-4 py-2.5 rounded-xl bg-[#030712] border text-white font-mono text-xs focus:outline-none transition ${
+                isCustomKeyActive ? 'border-cyan-500/50' : 'border-white/[0.08]'
+              }`}
             />
-            <p className="text-[11px] text-slate-500 mt-1">
-              Ключ используется для прямых вызовов Gemini AI API с сервера или клиента.
+            <p className="text-[11px] text-slate-400 mt-1">
+              {isCustomKeyActive
+                ? '⚡️ Вы используете собственный API-ключ. Запросы списываются с вашей квоты.'
+                : '✅ По умолчанию активен системный ключ RepurposeFlow. Оставьте поле пустым для работы через него, либо вставьте свой ключ.'}
             </p>
           </div>
 

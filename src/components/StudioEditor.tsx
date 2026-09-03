@@ -114,7 +114,8 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
         body: JSON.stringify({
           originalContent: selectedItem.content,
           instruction,
-          tone: job.tone
+          tone: job.tone,
+          apiKey: typeof window !== 'undefined' ? localStorage.getItem('custom_gemini_api_key') || undefined : undefined
         })
       });
       const data = await res.json();

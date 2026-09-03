@@ -26,6 +26,12 @@ export function createFreshUser(authenticated = false): UserProfile {
     minutesTotal: 360,
     minutesUsed: 0,
     isAuthenticated: authenticated,
+    createdAt: new Date().toISOString(),
+    preferences: {
+      defaultTone: 'b2b_expert',
+      defaultLanguage: 'ru',
+      themeColor: 'cyan'
+    },
     workspaces: [
       { id: `ws-${uid.slice(0, 6)}`, name: 'Личный воркспейс', slug: 'my-workspace', isAgencyClient: false, jobsCount: 0 }
     ],
@@ -88,6 +94,12 @@ export function registerUser(name: string, email: string): UserProfile {
     minutesTotal: 360,
     minutesUsed: 0,
     isAuthenticated: true,
+    createdAt: new Date().toISOString(),
+    preferences: {
+      defaultTone: 'b2b_expert',
+      defaultLanguage: 'ru',
+      themeColor: 'cyan'
+    },
     workspaces: [
       { id: `ws-${uid.slice(0, 6)}`, name: 'Личный воркспейс', slug: 'my-workspace', isAgencyClient: false, jobsCount: 0 }
     ],
