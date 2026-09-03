@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Sparkles, CheckCircle2, Loader2, Zap, ArrowRight, Video, Flame } from 'lucide-react';
+import { CheckCircle2, Loader2, ArrowRight, Radio } from 'lucide-react';
 import { MediaJob } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ProcessingStateProps {
   job: MediaJob;
@@ -10,14 +11,15 @@ interface ProcessingStateProps {
 }
 
 export const ProcessingState: React.FC<ProcessingStateProps> = ({ job, onComplete }) => {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
-    { title: 'Загрузка в защищенное хранилище S3/R2', detail: 'Проверка целостности медиапотока' },
-    { title: 'Анализ аудиоряда в Google Gemini 2.0', detail: 'Определение спикеров, интонаций и смысловых пиков' },
-    { title: 'Извлечение драматургии и таймкодов', detail: 'Поиск противоречий, инсайтов и вирусных хуков' },
-    { title: 'Параллельная генерация 15 форматов', detail: 'Адаптация под алгоритмы LinkedIn, VC.ru, Reels, Telegram' },
-    { title: 'Финализация контент-пакета', detail: 'Формирование интерактивной студии и структуры экспорта' }
+    { title: t.procStep1, detail: t.procStep1Desc },
+    { title: t.procStep2, detail: t.procStep2Desc },
+    { title: t.procStep3, detail: t.procStep3Desc },
+    { title: t.procStep4, detail: t.procStep4Desc },
+    { title: t.procStep5, detail: t.procStep5Desc }
   ];
 
   useEffect(() => {
@@ -41,20 +43,20 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ job, onComplet
 
   return (
     <div className="max-w-2xl mx-auto py-16 px-4 text-center">
-      <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl mb-8">
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-emerald-400 rounded-3xl blur-xl opacity-40 animate-pulse" />
-        <Flame className="w-10 h-10 text-indigo-400 relative z-10 animate-bounce" />
+      <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-[#080C14] border border-white/[0.08] shadow-2xl mb-8">
+        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 via-sky-500 to-indigo-500 rounded-3xl blur-xl opacity-40 animate-pulse" />
+        <Radio className="w-9 h-9 text-cyan-400 relative z-10 animate-bounce" />
       </div>
 
-      <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-        Gemini 2.0 перерабатывает запись
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        {t.procTitle}
       </h2>
       <p className="mt-2 text-sm text-slate-400 max-w-md mx-auto">
-        «{job.title}» ({job.durationFormatted || '30 мин'})
+        «{job.title}» ({job.durationFormatted || '30:00'})
       </p>
 
       {/* Steps checklist */}
-      <div className="mt-10 space-y-4 text-left max-w-md mx-auto">
+      <div className="mt-10 space-y-3.5 text-left max-w-md mx-auto">
         {steps.map((step, idx) => {
           const isDone = currentStep > idx;
           const isCurrent = currentStep === idx;
@@ -64,17 +66,17 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ job, onComplet
               key={idx}
               className={`p-4 rounded-2xl border transition-all flex items-start gap-3.5 ${
                 isDone
-                  ? 'bg-slate-900/40 border-emerald-500/30 text-slate-300'
+                  ? 'bg-[#080C14]/60 border-emerald-500/30 text-slate-300'
                   : isCurrent
-                  ? 'bg-indigo-950/40 border-indigo-500/60 shadow-lg shadow-indigo-500/10'
-                  : 'bg-slate-950/40 border-slate-900 text-slate-600'
+                  ? 'bg-cyan-950/30 border-cyan-500/60 shadow-lg shadow-cyan-500/10'
+                  : 'bg-[#080C14]/30 border-white/[0.05] text-slate-600'
               }`}
             >
               <div className="mt-0.5 shrink-0">
                 {isDone ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
                 ) : (
                   <div className="w-5 h-5 rounded-full border border-slate-800 flex items-center justify-center text-[10px] font-mono">
                     {idx + 1}
@@ -99,9 +101,9 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ job, onComplet
       <div className="mt-10">
         <button
           onClick={onComplete}
-          className="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white text-xs font-semibold transition inline-flex items-center gap-2"
+          className="px-6 py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-white text-xs font-bold transition inline-flex items-center gap-2"
         >
-          <span>Перейти в студию сразу</span>
+          <span>{t.procSkipBtn}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

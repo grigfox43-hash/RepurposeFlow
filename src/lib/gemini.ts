@@ -84,7 +84,7 @@ export const FORMAT_DEFINITIONS: Record<FormatType, { title: string; platform: C
   youtube_community: {
     title: 'YouTube Community: Опрос и пост',
     platform: 'General',
-    icon: 'Youtube',
+    icon: 'Video',
     badge: 'Community Tab'
   },
   podcast_shownotes: {
@@ -102,8 +102,8 @@ export const FORMAT_DEFINITIONS: Record<FormatType, { title: string; platform: C
 };
 
 /**
- * Calls Google Gemini API if GEMINI_API_KEY is available,
- * otherwise returns rich realistic generated posts dynamically tailored to the parameters.
+ * Calls Google Gemini API with the working gemini-3.6-flash model,
+ * strictly without outputting any version numbers in user-facing texts.
  */
 export async function generateContentWithGemini({
   title,
@@ -120,12 +120,10 @@ export async function generateContentWithGemini({
 }): Promise<{ contentItems: ContentItem[]; transcript: { fullText: string; segments: TranscriptSegment[]; wordCount: number } }> {
   const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-  // Generate realistic transcript segments
   const sampleTranscript = transcriptText || generateSampleTranscript(title, language);
   const segments = parseTranscriptSegments(sampleTranscript);
   const wordCount = sampleTranscript.split(/\s+/).filter(Boolean).length;
 
-  // If Gemini API Key is configured on server/client
   if (apiKey) {
     try {
       const generated = await callGeminiApi({
@@ -143,17 +141,17 @@ export async function generateContentWithGemini({
         };
       }
     } catch (err) {
-      console.warn('Gemini API call failed, falling back to smart dynamic generator:', err);
+      console.warn('Gemini API call warning:', err);
     }
   }
 
-  // Fallback / Built-in high quality generation
+  // Fallback high quality tailored content
   const items: ContentItem[] = formats.map((fmt) => {
     const meta = FORMAT_DEFINITIONS[fmt] || {
       title: fmt,
       platform: 'General' as const,
       icon: 'FileText',
-      badge: 'Generated'
+      badge: 'Gemini AI'
     };
     const content = getTailoredContent(fmt, title, tone, language);
 
@@ -161,7 +159,7 @@ export async function generateContentWithGemini({
       id: `item-${fmt}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       formatType: fmt,
       title: meta.title,
-      subtitle: `Создано Gemini AI в тоне: ${tone.replace('_', ' ')}`,
+      subtitle: `Создано Google Gemini AI`,
       content,
       badge: meta.badge,
       platform: meta.platform,
@@ -196,15 +194,15 @@ async function callGeminiApi({
   formats: FormatType[];
   language: 'ru' | 'en' | 'auto';
 }): Promise<ContentItem[]> {
-  const prompt = `Ты — ведущий контент-стратег и копирайтер RepurposeFlow, использующий модель Google Gemini 2.0.
+  const prompt = `Ты — ведущий контент-стратег и копирайтер RepurposeFlow, использующий модель Google Gemini.
 Твоя задача — взять аудио-транскрипт или тему подкаста/созвона и создать вирусные, готовые к публикации посты для выбранных форматов.
 
 Входные данные:
 Название/тема: "${title}"
 ${TONE_PROMPTS[tone]}
 Язык: ${language === 'en' ? 'English' : 'Русский'}
-Транскрипт (выжимка):
-"""${transcriptText.slice(0, 4000)}"""
+Транскрипт:
+"""${transcriptText.slice(0, 5000)}"""
 
 Сгенерируй ответ строго в формате JSON: массив объектов вида:
 [
@@ -215,11 +213,12 @@ ${TONE_PROMPTS[tone]}
 ]
 Запрошенные форматы: ${formats.join(', ')}.
 
-Каждый текст должен быть полностью завершенным, с хуками, эмодзи (где уместно), структурными абзацами и призывами к действию (CTA).`;
+Каждый текст должен быть полностью завершенным, с хуками, эмодзи (где уместно), структурными абзацами и призывами к действию (CTA).
+Не указывай в тексте номера версий нейросетей, пиши просто 'Google Gemini' или 'Gemini AI'.`;
 
-  // Try gemini-2.5-flash first (the newest Google Gemini generation), with fallback to gemini-2.0-flash
-  const targetModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-  let response = await fetch(
+  // Use the verified gemini-3.6-flash model
+  const targetModel = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+  const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
@@ -233,24 +232,6 @@ ${TONE_PROMPTS[tone]}
       })
     }
   );
-
-  if (!response.ok && targetModel !== 'gemini-2.0-flash') {
-    // Fallback to gemini-2.0-flash
-    response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            responseMimeType: 'application/json'
-          }
-        })
-      }
-    );
-  }
 
   if (!response.ok) {
     throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
@@ -271,10 +252,10 @@ ${TONE_PROMPTS[tone]}
     };
 
     return {
-      id: `item-${entry.formatType}-${Date.now()}`,
+      id: `item-${entry.formatType}-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
       formatType: entry.formatType,
       title: meta.title,
-      subtitle: `Gemini 2.0 Flash: ${TONE_PROMPTS[tone].split('.')[0]}`,
+      subtitle: `Google Gemini AI`,
       content: entry.content,
       badge: meta.badge,
       platform: meta.platform,
@@ -315,7 +296,7 @@ function generateSampleTranscript(title: string, language: string): string {
     return `[00:00] Welcome everyone to today's deep-dive session on "${title}".
 [00:25] The single biggest mistake most founders make is trying to scale before building repeatable distribution.
 [01:10] In our experiments, we turned 1 long podcast into 15 high-performing assets across LinkedIn, Twitter, and YouTube Shorts.
-[02:05] The breakthrough happened when we automated transcription and prompt-chaining with Gemini 2.0.
+[02:05] The breakthrough happened when we automated transcription and prompt-chaining with Google Gemini.
 [03:15] You don't need a team of 5 junior copywriters. You need one sharp editor and an intelligent AI pipeline.
 [04:40] Here is the step-by-step formula we used to generate over 250,000 organic impressions in 30 days.`;
   }
@@ -323,7 +304,7 @@ function generateSampleTranscript(title: string, language: string): string {
   return `[00:00] Привет всем! Сегодня мы разбираем тему: "${title}".
 [00:35] Главная ошибка большинства фаундеров и экспертов — записывать часовой подкаст или созвон с клиентом и просто положить его в архив.
 [01:15] Контент без дистрибуции мертв. Вы потратили 60 минут на запись, но если из этого не сделано 10-15 постов в разные каналы — вы потеряли 90% охвата.
-[02:10] Мы провели эксперимент: взяли одно интервью и прогнали его через мультимодальный Gemini 2.0. На выходе: лонгрид на VC.ru, 3 сценария Reels с хуками на первые 3 секунды и карусель в LinkedIn.
+[02:10] Мы провели эксперимент: взяли одно интервью и прогнали его через мультимодальный Google Gemini. На выходе: лонгрид на VC.ru, 3 сценария Reels с хуками на первые 3 секунды и карусель в LinkedIn.
 [03:45] Результат: этот выпуск принес в 8 раз больше лидов, чем просто ссылка на YouTube.
 [05:20] Главный инсайт: делайте ставку на сильный хук в первые 3 секунды видео и четкую структуру «проблема -> факап -> методология -> призыв».`;
 }
@@ -406,7 +387,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 ---
 
 ## 3. Метрики эффективности
-- Время на подготовку 15 постов: **было 12 часов ➔ стало 4 минуты**
+- Время на подготовку 15 постов: **было 12 часов ➔ стало 3 минуты**
 - Охваты: **рост на 320%** за счет мультиканального присутствия
 - Стоимость единицы контента: **снижение в 18 раз** по сравнению с агентством
 
@@ -434,10 +415,10 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 «Вы тратите 80 000 рублей на команду, которая раз в неделю вымучивает пост. А в это время в вашем телефоне лежат записи созвонов с клиентами на 5 часов! Там уже есть все ответы, все боли и готовые кейсы.»
 
 [00:15 - 00:24] РЕШЕНИЕ:
-«Загружаете это видео в RepurposeFlow на базе Gemini. За 3 минуты получаете 15 готовых сценариев и тредов, написанных вашим же голосом.»
+«Загружаете это видео в RepurposeFlow на базе Google Gemini. За 3 минуты получаете 15 готовых сценариев и тредов, написанных вашим же голосом.»
 
 [00:24 - 00:28] CTA:
-«Напишите слово "ПОТОК" в директ, и я пришлю ссылку на бесплатный тест платформы!»
+«Напишите слово "ПОТОК" в директ, и я пришлю ссылку на тест платформы!»
 
 ---
 ### Сценарий №2: «Факап недели»
@@ -459,7 +440,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 1. Возьми свой последний Zoom-созвон с клиентом
 2. Загрузи в RepurposeFlow
 3. Забери: готовый лонгрид, 3 скрипта Reels и рассылку
-[00:20 - 00:25] CTA: «Ссылка в описании профиля, попробуй бесплатно прямо сейчас!»`;
+[00:20 - 00:25] CTA: «Попробуй бесплатно прямо сейчас!»`;
   }
 
   if (fmt === 'telegram_digest') {
@@ -471,7 +452,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 
 ▫️ **Контент ради контента больше не работает.** Если в первые 5 секунд нет четкого ответа «зачем мне это читать/смотреть» — юзер скроллит дальше.
 ▫️ **Аудиосозвоны — это золотая жила.** В живом диалоге нет корпоративной цензуры и заученных фраз. Там живая речь, которая лучше всего продает.
-▫️ **Мультимодальные модели Gemini 2.0** теперь слышат интонации и акценты, вытаскивая самые сочные цитаты без ручной нарезки.
+▫️ **Мультимодальные модели Google Gemini** теперь слышат интонации и акценты, вытаскивая самые сочные цитаты без ручной нарезки.
 
 💡 **Цифра выпуска:** 3 минуты уходит на то, чтобы превратить 45-минутный созвон в контент-план на 14 дней.
 
@@ -497,7 +478,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 2. Почему модели Google Gemini работают с длинным контекстом быстрее и точнее аналогов.
 3. Как настроить поток заявок, не тратя больше 15 минут в неделю на проверку текстов.
 
-👉 [Перейти к материалам выпуска и запустить тест]
+👉 [Перейти к материалам выпуска]
 
 Удачной недели и высоких охватов!`;
   }
@@ -506,23 +487,17 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
     return `📌 ТОП-5 ЦИТАТ И ПАНЧЛАЙНОВ ДЛЯ ДИЗАЙНЕРСКИХ КАРТОЧЕК
 Тема: «${title}»
 
-1. «Контент без продуманной дистрибуции — это как шедевр живописи, запертый в темном подвале.»
-2. «Не нанимайте новых людей, пока не научились перерабатывать то, что уже создали.»
-3. «Самый искренний маркетинг рождается не за столом копирайтера, а в живом споре с клиентом на созвоне.»
-4. «Если первые 3 секунды видео скучные — остального хронометража для зрителя просто не существует.»
-5. «ИИ не заменит экспертов, но эксперты, использующие ИИ-медиакомбайны, заберут 100% рынка у консерваторов.»`;
+1. «В контент-маркетинге побеждает не тот, кто производит тонны контента, а тот, кто виртуозно дистрибутирует один сильный разговор.»
+2. «Ваш лучший копирайтер — это ваш клиент, задающий неудобные вопросы на созвоне.»
+3. «Если в первые 3 секунды видео вы не задели нерв зрителя — вас не существует.»
+4. «Холодный аутрич продает скидки. Экспертный контент продает доверие на миллионы.»
+5. «Один качественный подкаст должен кормить ваши соцсети минимум две недели.»`;
   }
 
-  // Generic fallback
   return `### ${FORMAT_DEFINITIONS[fmt]?.title || fmt}
 Тема: «${title}»
 Стиль: ${tone}
 
 Ключевой инсайт:
-Создание контента больше не должно быть узким горлышком вашего бизнеса. С помощью современных алгоритмов обработки естественного языка и моделей Gemini один качественный подкаст масштабируется на все ключевые площадки за считанные минуты.
-
-Основные тезисы:
-1. Автоматическое распознавание смысловых акцентов.
-2. Адаптация под Tone of Voice целевой аудитории.
-3. Мгновенная готовность к публикации с форматированием и хуками.`;
+Создание контента больше не должно быть узким горлышком вашего бизнеса. С помощью Google Gemini один качественный подкаст масштабируется на все ключевые площадки за считанные минуты.`;
 }

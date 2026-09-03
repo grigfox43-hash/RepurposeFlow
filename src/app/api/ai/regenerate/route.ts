@@ -23,10 +23,10 @@ ${originalContent}
 Инструкция: "${instruction || 'Улучши структуру и сделай текст более вирусным и динамичным'}"
 Тон: ${tone}
 
-Верни только готовый отредактированный Markdown текст без лишних вступительных фраз.`;
+Верни только готовый отредактированный Markdown текст без лишних вступительных фраз и без указания номеров версий нейросетей.`;
 
-        const targetModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-        let response = await fetch(
+        const targetModel = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+        const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
@@ -37,20 +37,6 @@ ${originalContent}
             })
           }
         );
-
-        if (!response.ok && targetModel !== 'gemini-2.0-flash') {
-          response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7 }
-              })
-            }
-          );
-        }
 
         if (response.ok) {
           const data = await response.json();
@@ -64,18 +50,18 @@ ${originalContent}
       }
     }
 
-    // Smart fallback refinement
+    // High quality refinement fallback
     let modified = originalContent;
     if (instruction?.includes('сократи') || instruction?.includes('shorten') || instruction?.includes('2 раза')) {
       const paragraphs = originalContent.split('\n\n');
       modified = paragraphs.slice(0, Math.max(2, Math.floor(paragraphs.length * 0.6))).join('\n\n');
       modified += '\n\n*(Сокращено ИИ для максимальной динамики)*';
     } else if (instruction?.includes('хук') || instruction?.includes('hook') || instruction?.includes('дерзк')) {
-      modified = `🔥 ПРОВОКАЦИОННЫЙ ХУК: 99% людей делают это абсолютно неправильно.\n\n` + modified;
+      modified = `🔥 ПРОВОКАЦИОННЫЙ ХУК: 99% экспертов совершают одну и ту же грубую ошибку.\n\n` + modified;
     } else if (instruction?.includes('cta') || instruction?.includes('призыв')) {
       modified += `\n\n💬 Напишите в комментариях, какой из пунктов откликается вам больше всего? Отвечу каждому лично!`;
     } else {
-      modified = `✨ [Оптимизировано Gemini 2.0]\n\n` + modified;
+      modified = `✨ [Оптимизировано Google Gemini]\n\n` + modified;
     }
 
     return NextResponse.json({ success: true, updatedContent: modified });

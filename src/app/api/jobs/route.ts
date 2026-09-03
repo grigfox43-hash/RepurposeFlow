@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateContentWithGemini } from '@/lib/gemini';
-import { FormatType, ToneOfVoice } from '@/types';
+import { dbSaveJob } from '@/lib/db';
+import { FormatType, ToneOfVoice, MediaJob } from '@/types';
 
 export async function POST(req: Request) {
   try {
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
     const jobId = `job-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
-    // If n8n Webhook is configured, forward the job to n8n!
+    // Optional n8n Webhook trigger
     if (n8nWebhookUrl) {
       try {
         fetch(n8nWebhookUrl, {
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Call our high-speed Gemini processor directly
+    // Call Google Gemini processor directly
     const { contentItems, transcript } = await generateContentWithGemini({
       title,
       tone: tone as ToneOfVoice,
@@ -57,16 +58,16 @@ export async function POST(req: Request) {
       language
     });
 
-    const job = {
+    const job: MediaJob = {
       id: jobId,
       workspaceId,
       title,
       sourceType,
       fileName: fileName || (sourceType === 'youtube' ? 'YouTube Stream' : 'Audio Track'),
-      fileUrl: fileUrl || 'https://storage.repurposeflow.io/sample.mp3',
+      fileUrl: fileUrl || '',
       durationSeconds,
       durationFormatted,
-      status: 'completed' as const,
+      status: 'completed',
       progressPercent: 100,
       language,
       tone,
@@ -77,6 +78,9 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
       completedAt: new Date().toISOString()
     };
+
+    // Save directly to real persistent database
+    await dbSaveJob(job);
 
     return NextResponse.json({ success: true, job });
   } catch (err: any) {

@@ -7,8 +7,8 @@ import { Dashboard } from '@/components/Dashboard';
 import { UploadModal } from '@/components/UploadModal';
 import { ProcessingState } from '@/components/ProcessingState';
 import { StudioEditor } from '@/components/StudioEditor';
-import { BillingModal } from '@/components/BillingModal';
 import { SettingsModal } from '@/components/SettingsModal';
+import { LanguageProvider } from '@/context/LanguageContext';
 import {
   getStoredJobs,
   saveStoredJobs,
@@ -17,26 +17,47 @@ import {
 } from '@/lib/store';
 import { MediaJob, UserProfile } from '@/types';
 
-export default function Home() {
+function AppContent() {
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'studio'>('landing');
   const [user, setUser] = useState<UserProfile>(getStoredUser);
-  const [jobs, setJobs] = useState<MediaJob[]>(getStoredJobs);
+  const [jobs, setJobs] = useState<MediaJob[]>([]);
   const [activeJob, setActiveJob] = useState<MediaJob | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Modals
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [isBillingOpen, setIsBillingOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // Load jobs from real database API on mount
   useEffect(() => {
-    // Sync with storage on mount
     setUser(getStoredUser());
-    const loadedJobs = getStoredJobs();
-    setJobs(loadedJobs);
-    if (loadedJobs.length > 0) {
-      setActiveJob(loadedJobs[0]);
-    }
+    const loadFromDb = async () => {
+      try {
+        const res = await fetch('/api/db/jobs');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.jobs) {
+            setJobs(data.jobs);
+            saveStoredJobs(data.jobs);
+            if (data.jobs.length > 0) {
+              setActiveJob(data.jobs[0]);
+            }
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Database fetch fallback to local storage:', err);
+      }
+
+      // Fallback to local storage
+      const local = getStoredJobs();
+      setJobs(local);
+      if (local.length > 0) {
+        setActiveJob(local[0]);
+      }
+    };
+
+    loadFromDb();
   }, []);
 
   const handleUpdateUser = (updatedUser: UserProfile) => {
@@ -62,7 +83,6 @@ export default function Home() {
     const updatedJobs = [newJob, ...jobs];
     handleUpdateJobs(updatedJobs);
 
-    // Charge minutes
     const updatedUser = {
       ...user,
       minutesUsed: user.minutesUsed + (newJob.minutesCharged || 30)
@@ -84,11 +104,18 @@ export default function Home() {
     setCurrentView('studio');
   };
 
-  const handleDeleteJob = (jobId: string) => {
+  const handleDeleteJob = async (jobId: string) => {
     const updated = jobs.filter((j) => j.id !== jobId);
     handleUpdateJobs(updated);
     if (activeJob?.id === jobId) {
       setActiveJob(updated[0] || null);
+    }
+
+    // Delete in real database
+    try {
+      await fetch(`/api/db/jobs/${jobId}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('Failed to delete job from DB:', err);
     }
   };
 
@@ -99,7 +126,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
+    <div className="min-h-screen bg-[#030712] text-slate-100 font-sans">
       <Navbar
         currentView={currentView}
         onNavigate={(view) => {
@@ -112,7 +139,6 @@ export default function Home() {
         activeWorkspace={activeWorkspace}
         onSelectWorkspace={handleSelectWorkspace}
         onOpenUpload={() => setIsUploadOpen(true)}
-        onOpenBilling={() => setIsBillingOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
@@ -127,15 +153,6 @@ export default function Home() {
                 setCurrentView('dashboard');
               }
             }}
-            onSelectPlan={(planId) => {
-              const minutesMap = { starter: 120, pro: 360, agency: 1200 };
-              handleUpdateUser({
-                ...user,
-                plan: planId,
-                minutesTotal: minutesMap[planId]
-              });
-              setCurrentView('dashboard');
-            }}
           />
         )}
 
@@ -147,7 +164,6 @@ export default function Home() {
             onOpenUpload={() => setIsUploadOpen(true)}
             onOpenStudio={handleOpenStudio}
             onDeleteJob={handleDeleteJob}
-            onOpenBilling={() => setIsBillingOpen(true)}
           />
         )}
 
@@ -162,11 +178,11 @@ export default function Home() {
                 onUpdateJob={handleUpdateActiveJob}
               />
             ) : (
-              <div className="py-20 text-center text-slate-400">
+              <div className="py-24 text-center text-slate-400">
                 <p>Нет выбранного проекта.</p>
                 <button
                   onClick={() => setIsUploadOpen(true)}
-                  className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold"
+                  className="mt-4 px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold transition"
                 >
                   Создать новый проект
                 </button>
@@ -185,17 +201,18 @@ export default function Home() {
         onJobStarted={handleJobStarted}
       />
 
-      <BillingModal
-        isOpen={isBillingOpen}
-        onClose={() => setIsBillingOpen(false)}
-        user={user}
-        onUpdateUser={handleUpdateUser}
-      />
-
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }

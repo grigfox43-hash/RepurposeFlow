@@ -6,26 +6,17 @@ import {
   Copy,
   Check,
   Download,
-  Share2,
   Sparkles,
   FileText,
-  Video,
-  Send,
-  Mail,
-  Quote,
-  Layers,
   ArrowLeft,
   Search,
-  ExternalLink,
   BookOpen,
   Wand2,
   RefreshCw,
-  Clock,
-  Flame,
-  FileCode,
   FileSpreadsheet
 } from 'lucide-react';
-import { MediaJob, ContentItem } from '@/types';
+import { MediaJob } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface StudioEditorProps {
   job: MediaJob;
@@ -38,6 +29,7 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
   onBackToDashboard,
   onUpdateJob
 }) => {
+  const { t } = useLanguage();
   const [selectedItemId, setSelectedItemId] = useState<string>(
     job.contentItems[0]?.id || ''
   );
@@ -51,7 +43,7 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
 
   const selectedItem = job.contentItems.find((item) => item.id === selectedItemId) || job.contentItems[0];
 
-  const handleContentChange = (newText: string) => {
+  const handleContentChange = async (newText: string) => {
     if (!selectedItem) return;
     const updatedItems = job.contentItems.map((item) =>
       item.id === selectedItem.id
@@ -62,14 +54,26 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
           }
         : item
     );
-    onUpdateJob({ ...job, contentItems: updatedItems });
+    const updatedJob = { ...job, contentItems: updatedItems };
+    onUpdateJob(updatedJob);
+
+    // Save update to server-side database
+    try {
+      fetch(`/api/db/jobs/${job.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedJob)
+      }).catch((e) => console.warn('DB sync warning:', e));
+    } catch {
+      // ignore
+    }
   };
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedState(label);
-      confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
+      confetti({ particleCount: 35, spread: 60, origin: { y: 0.8 } });
       setTimeout(() => setCopiedState(null), 2500);
     } catch (err) {
       console.error('Failed to copy', err);
@@ -78,7 +82,7 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
 
   const exportToNotionFormat = () => {
     if (!selectedItem) return;
-    const notionMarkdown = `# ${selectedItem.title}\n\n*Сгенерировано в RepurposeFlow (Gemini 2.0)*\n\n${selectedItem.content}`;
+    const notionMarkdown = `# ${selectedItem.title}\n\n*Created with RepurposeFlow (Google Gemini)*\n\n${selectedItem.content}`;
     copyToClipboard(notionMarkdown, 'notion');
   };
 
@@ -116,10 +120,10 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
       const data = await res.json();
       if (data.success && data.updatedContent) {
         handleContentChange(data.updatedContent);
-        confetti({ particleCount: 50, spread: 70 });
+        confetti({ particleCount: 45, spread: 70 });
       }
     } catch (err) {
-      alert('Ошибка перегенерации');
+      alert('AI refinement error');
     } finally {
       setIsAiRefining(false);
       setShowAiInput(false);
@@ -135,23 +139,23 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Top Breadcrumbs and Actions Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToDashboard}
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition"
-            title="Назад к списку проектов"
+            className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-slate-400 hover:text-white hover:border-white/[0.2] transition"
+            title={t.studioBack}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-950 text-emerald-300 border border-emerald-800/40 font-semibold uppercase">
-                Завершено
+              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/40">
+                {t.dashStatusCompleted}
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                {job.durationFormatted || '30:00'} • {job.contentItems.length} форматов
+                {job.durationFormatted || '30:00'} • {job.contentItems.length} {t.featuresTitle.toLowerCase()}
               </span>
             </div>
             <h1 className="text-lg sm:text-xl font-bold text-white mt-1 max-w-xl truncate">
@@ -160,48 +164,48 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
           </div>
         </div>
 
-        {/* View mode toggle: Content items vs Full Transcript */}
+        {/* View Mode Switcher */}
         <div className="flex items-center gap-2">
-          <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800">
+          <div className="inline-flex p-1 rounded-xl bg-[#080C14] border border-white/[0.08]">
             <button
               onClick={() => setActiveViewMode('content')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
                 activeViewMode === 'content'
-                  ? 'bg-indigo-600 text-white shadow'
+                  ? 'bg-cyan-500 text-black shadow'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-              <span>Публикации ({job.contentItems.length})</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t.studioViewPosts} ({job.contentItems.length})</span>
             </button>
             <button
               onClick={() => setActiveViewMode('transcript')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
                 activeViewMode === 'transcript'
-                  ? 'bg-indigo-600 text-white shadow'
+                  ? 'bg-cyan-500 text-black shadow'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>Транскрипт с таймкодами</span>
+              <span>{t.studioViewTranscript}</span>
             </button>
           </div>
         </div>
       </div>
 
       {activeViewMode === 'content' ? (
-        /* Split View: Left List, Right Editor */
+        /* Split View */
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Formats Tree */}
+          {/* Left: Formats Tree */}
           <div className="lg:col-span-4 space-y-3">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Поиск по форматам..."
+                placeholder={t.studioSearchFormats}
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#080C14] border border-white/[0.08] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
               />
             </div>
 
@@ -212,18 +216,18 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
                   <button
                     key={item.id}
                     onClick={() => setSelectedItemId(item.id)}
-                    className={`w-full p-3 rounded-2xl text-left border transition-all ${
+                    className={`w-full p-3.5 rounded-2xl text-left border transition-all ${
                       isSelected
-                        ? 'bg-indigo-950/40 border-indigo-500/70 shadow-lg shadow-indigo-600/10'
-                        : 'bg-slate-900/50 border-slate-800/80 hover:bg-slate-900 hover:border-slate-700'
+                        ? 'bg-cyan-950/30 border-cyan-500/70 shadow-lg shadow-cyan-500/10'
+                        : 'bg-[#080C14]/70 border-white/[0.06] hover:bg-[#0B0F19] hover:border-white/[0.15]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-white/[0.06] text-slate-300">
                         {item.platform}
                       </span>
                       {item.badge && (
-                        <span className="text-[10px] text-indigo-300 font-medium">
+                        <span className="text-[10px] text-cyan-300 font-medium">
                           {item.badge}
                         </span>
                       )}
@@ -232,12 +236,12 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
                       {item.title}
                     </div>
                     <div className="text-[11px] text-slate-400 mt-1 line-clamp-2">
-                      {item.content.replace(/[#*`_]/g, '').slice(0, 100)}...
+                      {item.content.replace(/[#*`_]/g, '').slice(0, 95)}...
                     </div>
                     <div className="mt-2 flex items-center gap-2 text-[10px] text-slate-500 font-mono">
-                      <span>{item.wordCount || item.content.split(/\s+/).length} слов</span>
+                      <span>{item.wordCount || item.content.split(/\s+/).length} {t.studioWordsCount}</span>
                       <span>•</span>
-                      <span>~{item.readingTimeMinutes || 2} мин чтения</span>
+                      <span>~{item.readingTimeMinutes || 2} min</span>
                     </div>
                   </button>
                 );
@@ -245,15 +249,15 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Active Item Editor & Export Hub */}
-          <div className="lg:col-span-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl p-6 relative">
+          {/* Right: Active Item Editor */}
+          <div className="lg:col-span-8 rounded-3xl bg-[#080C14]/95 border border-white/[0.08] shadow-2xl p-6 relative">
             {selectedItem ? (
               <div>
                 {/* Editor Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/[0.06] gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-indigo-400 uppercase">
+                      <span className="text-xs font-bold text-cyan-400 uppercase">
                         {selectedItem.platform}
                       </span>
                       <span className="text-slate-600">•</span>
@@ -268,83 +272,83 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => copyToClipboard(selectedItem.content, 'copy')}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-md"
+                      className="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold transition flex items-center gap-1.5 shadow-md"
                     >
                       {copiedState === 'copy' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedState === 'copy' ? 'Скопировано!' : 'Копировать'}</span>
+                      <span>{copiedState === 'copy' ? t.studioCopied : t.studioCopy}</span>
                     </button>
 
                     <button
                       onClick={exportToNotionFormat}
-                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition flex items-center gap-1.5"
-                      title="Скопировать для Notion"
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 text-xs font-medium border border-white/[0.08] transition flex items-center gap-1.5"
+                      title="Export to Notion"
                     >
-                      {copiedState === 'notion' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <BookOpen className="w-3.5 h-3.5 text-indigo-400" />}
-                      <span>{copiedState === 'notion' ? 'Готово для Notion!' : 'В Notion'}</span>
+                      {copiedState === 'notion' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <BookOpen className="w-3.5 h-3.5 text-cyan-400" />}
+                      <span>{copiedState === 'notion' ? t.studioNotionReady : t.studioNotion}</span>
                     </button>
 
                     <button
                       onClick={exportToGoogleDocsFormat}
-                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition flex items-center gap-1.5"
-                      title="Скопировать в буфер для Google Docs"
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 text-xs font-medium border border-white/[0.08] transition flex items-center gap-1.5"
+                      title="Google Docs"
                     >
                       {copiedState === 'gdocs' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />}
-                      <span>Google Docs</span>
+                      <span>{t.studioGDocs}</span>
                     </button>
 
                     <button
                       onClick={() => downloadFile('md')}
-                      className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
-                      title="Скачать .md файл"
+                      className="p-1.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08] transition"
+                      title={t.studioDownloadMd}
                     >
                       <Download className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                {/* AI Tuning Quick Bar */}
-                <div className="mt-4 p-2.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                {/* AI Tuning Bar */}
+                <div className="mt-4 p-2.5 rounded-2xl bg-[#030712] border border-white/[0.06] flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1 px-1">
-                      <Sparkles className="w-3 h-3 text-emerald-400" /> Gemini Редактор:
+                      <Sparkles className="w-3 h-3 text-cyan-400" /> {t.studioAiTools}
                     </span>
                     <button
                       disabled={isAiRefining}
-                      onClick={() => handleAiRefine('Сократи текст ровно в 2 раза, сохранив самые сильные тезисы')}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] text-slate-300 border border-slate-800 transition disabled:opacity-50"
+                      onClick={() => handleAiRefine('Сократи текст ровно в 2 раза, сохранив главные тезисы')}
+                      className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-[11px] text-slate-300 border border-white/[0.08] transition disabled:opacity-50"
                     >
-                      ✂️ Сократить в 2 раза
+                      {t.studioAiShorten}
                     </button>
                     <button
                       disabled={isAiRefining}
-                      onClick={() => handleAiRefine('Сделай хук в первой строке максимально провокационным и дерзким')}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] text-slate-300 border border-slate-800 transition disabled:opacity-50"
+                      onClick={() => handleAiRefine('Сделай хук в первой строке максимально цепляющим и дерзким')}
+                      className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-[11px] text-slate-300 border border-white/[0.08] transition disabled:opacity-50"
                     >
-                      🔥 Усилить хук
+                      {t.studioAiHook}
                     </button>
                     <button
                       disabled={isAiRefining}
-                      onClick={() => handleAiRefine('Добавь мощный призыв к действию (CTA) с вопросом для комментариев')}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] text-slate-300 border border-slate-800 transition disabled:opacity-50"
+                      onClick={() => handleAiRefine('Добавь мощный призыв к действию (CTA)')}
+                      className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-[11px] text-slate-300 border border-white/[0.08] transition disabled:opacity-50"
                     >
-                      🎯 Добавить CTA
+                      {t.studioAiCta}
                     </button>
                   </div>
 
                   <button
                     onClick={() => setShowAiInput(!showAiInput)}
-                    className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold px-2 py-1 flex items-center gap-1"
+                    className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold px-2 py-1 flex items-center gap-1"
                   >
-                    <Wand2 className="w-3 h-3" /> Свой промпт
+                    <Wand2 className="w-3 h-3" /> {t.studioAiCustomBtn}
                   </button>
                 </div>
 
-                {/* Custom AI prompt input */}
+                {/* Custom AI Prompt Input */}
                 {showAiInput && (
-                  <div className="mt-3 flex items-center gap-2 p-2 rounded-xl bg-slate-950 border border-indigo-500/40">
+                  <div className="mt-3 flex items-center gap-2 p-2 rounded-xl bg-[#030712] border border-cyan-500/40">
                     <input
                       type="text"
-                      placeholder="Например: Перепиши для аудитории стартап-фаундеров..."
+                      placeholder={t.studioAiCustomPlaceholder}
                       value={customAiPrompt}
                       onChange={(e) => setCustomAiPrompt(e.target.value)}
                       className="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none px-2"
@@ -352,20 +356,20 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
                     <button
                       onClick={() => handleAiRefine(customAiPrompt)}
                       disabled={!customAiPrompt.trim() || isAiRefining}
-                      className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 disabled:opacity-50"
+                      className="px-3 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold shrink-0 disabled:opacity-50"
                     >
-                      Применить
+                      {t.studioAiApply}
                     </button>
                   </div>
                 )}
 
-                {/* Live Editable Textarea */}
+                {/* Textarea */}
                 <div className="mt-4 relative">
                   {isAiRefining && (
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
-                      <div className="flex items-center gap-2 text-indigo-400 font-semibold text-xs animate-pulse">
+                    <div className="absolute inset-0 bg-[#030712]/80 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
+                      <div className="flex items-center gap-2 text-cyan-400 font-semibold text-xs animate-pulse">
                         <RefreshCw className="w-4 h-4 animate-spin" />
-                        <span>Google Gemini 2.0 полирует текст...</span>
+                        <span>{t.studioAiProcessing}</span>
                       </div>
                     </div>
                   )}
@@ -374,57 +378,55 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
                     value={selectedItem.content}
                     onChange={(e) => handleContentChange(e.target.value)}
                     rows={18}
-                    className="w-full p-4 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-indigo-500 resize-y"
+                    className="w-full p-4 rounded-2xl bg-[#030712] border border-white/[0.08] font-mono text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-cyan-500 resize-y"
                   />
                 </div>
 
                 {/* Footer status */}
                 <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
-                  <div className="flex items-center gap-3">
-                    <span>Слов: <strong className="text-white font-mono">{selectedItem.wordCount || selectedItem.content.split(/\s+/).length}</strong></span>
-                    <span>Символов: <strong className="text-white font-mono">{selectedItem.content.length}</strong></span>
+                  <div className="flex items-center gap-3 font-mono">
+                    <span>{t.studioWordsCount}: <strong className="text-white">{selectedItem.wordCount || selectedItem.content.split(/\s+/).length}</strong></span>
+                    <span>{t.studioCharsCount}: <strong className="text-white">{selectedItem.content.length}</strong></span>
                   </div>
-                  <div className="text-slate-500 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-emerald-400" /> Автосохранение включено
+                  <div className="text-emerald-400 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> {t.studioAutoSaved}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-20 text-slate-500">Выберите публикацию для просмотра</div>
+              <div className="text-center py-20 text-slate-500">Select an item to view</div>
             )}
           </div>
         </div>
       ) : (
-        /* Full Audio Transcript Viewer */
-        <div className="mt-6 rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
+        /* Full Transcript */
+        <div className="mt-6 rounded-3xl bg-[#080C14] border border-white/[0.08] p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/[0.08] gap-4">
             <div>
-              <h2 className="text-lg font-bold text-white">Полный транскрипт записи</h2>
-              <p className="text-xs text-slate-400">
-                Распознано с таймкодами спикеров и сегментацией смыслов
-              </p>
+              <h2 className="text-lg font-bold text-white">{t.studioViewTranscript}</h2>
+              <p className="text-xs text-slate-400">Google Gemini verbatim transcript</p>
             </div>
             <div className="relative">
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Поиск по транскрипту..."
+                placeholder={t.studioTranscriptSearch}
                 value={transcriptSearch}
                 onChange={(e) => setTranscriptSearch(e.target.value)}
-                className="pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="pl-9 pr-4 py-2 rounded-xl bg-[#030712] border border-white/[0.08] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
               />
             </div>
           </div>
 
-          <div className="mt-6 space-y-4 max-h-[600px] overflow-y-auto pr-2">
+          <div className="mt-6 space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {job.transcript?.segments
               ?.filter((seg) => seg.text.toLowerCase().includes(transcriptSearch.toLowerCase()))
               .map((seg) => (
                 <div
                   key={seg.id}
-                  className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex items-start gap-4 hover:border-slate-700 transition"
+                  className="p-4 rounded-2xl bg-[#030712]/70 border border-white/[0.06] flex items-start gap-4 hover:border-white/[0.15] transition"
                 >
-                  <div className="px-2.5 py-1 rounded-lg bg-slate-800 text-indigo-300 font-mono text-xs font-bold shrink-0">
+                  <div className="px-2.5 py-1 rounded-lg bg-white/[0.06] text-cyan-300 font-mono text-xs font-bold shrink-0">
                     {seg.start}
                   </div>
                   <div>
@@ -434,7 +436,7 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
                 </div>
               )) || (
               <div className="text-slate-400 text-xs p-4">
-                {job.transcript?.fullText || 'Транскрипт обрабатывается...'}
+                {job.transcript?.fullText || 'Processing transcript...'}
               </div>
             )}
           </div>
