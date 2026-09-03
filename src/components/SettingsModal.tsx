@@ -1,0 +1,136 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { X, Key, Globe, Database, Sparkles, Check, Server, Shield, ExternalLink } from 'lucide-react';
+
+interface SettingsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+  const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [n8nWebhookUrl, setN8nWebhookUrl] = useState('');
+  const [s3Bucket, setS3Bucket] = useState('repurposeflow-media');
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setGeminiApiKey(localStorage.getItem('custom_gemini_api_key') || '');
+      setN8nWebhookUrl(localStorage.getItem('custom_n8n_webhook') || '');
+      setS3Bucket(localStorage.getItem('custom_s3_bucket') || 'repurposeflow-media');
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('custom_gemini_api_key', geminiApiKey.trim());
+      localStorage.setItem('custom_n8n_webhook', n8nWebhookUrl.trim());
+      localStorage.setItem('custom_s3_bucket', s3Bucket.trim());
+    }
+    setSavedSuccess(true);
+    setTimeout(() => {
+      setSavedSuccess(false);
+      onClose();
+    }, 1200);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="relative w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-6 sm:p-8 text-left">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
+              <Key className="w-4 h-4 text-indigo-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Интеграции и настройки API</h2>
+              <p className="text-xs text-slate-400">Настройка Google Gemini, n8n и хранилища S3/R2</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSave} className="mt-6 space-y-5">
+          {/* Google Gemini API Key */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Google Gemini API Key:
+              </span>
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+              >
+                Получить ключ в Google AI Studio <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            </label>
+            <input
+              type="password"
+              placeholder="AIzaSy..."
+              value={geminiApiKey}
+              onChange={(e) => setGeminiApiKey(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+            />
+            <p className="text-[11px] text-slate-500 mt-1">
+              Ключ используется для прямых вызовов Gemini 2.0 Flash / Pro API с сервера или клиента.
+            </p>
+          </div>
+
+          {/* n8n Webhook URL */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <Server className="w-3.5 h-3.5 text-violet-400" /> URL вебхука n8n:
+            </label>
+            <input
+              type="url"
+              placeholder="https://n8n.yourdomain.com/webhook/repurposeflow-job"
+              value={n8nWebhookUrl}
+              onChange={(e) => setN8nWebhookUrl(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+            />
+            <p className="text-[11px] text-slate-500 mt-1">
+              Шаблон воркфлоу находится в папке <code>/n8n/workflow-repurposeflow-gemini.json</code>
+            </p>
+          </div>
+
+          {/* S3/R2 Bucket */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <Database className="w-3.5 h-3.5 text-sky-400" /> Cloudflare R2 / S3 Bucket Name:
+            </label>
+            <input
+              type="text"
+              value={s3Bucket}
+              onChange={(e) => setS3Bucket(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+
+          <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div className="text-[11px] text-emerald-400 flex items-center gap-1">
+              <Shield className="w-3.5 h-3.5" /> Ключи сохраняются локально в вашем браузере
+            </div>
+            <button
+              type="submit"
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md"
+            >
+              {savedSuccess ? <Check className="w-4 h-4" /> : null}
+              <span>{savedSuccess ? 'Сохранено!' : 'Сохранить настройки'}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
