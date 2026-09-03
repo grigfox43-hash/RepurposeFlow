@@ -3,21 +3,34 @@
 import { MediaJob, UserProfile, Workspace } from '@/types';
 
 export const INITIAL_WORKSPACES: Workspace[] = [
-  { id: 'ws-personal', name: 'Личный бренд', slug: 'founder-personal', isAgencyClient: false, jobsCount: 0 },
-  { id: 'ws-client-agency', name: 'Клиентский проект', slug: 'client-project', isAgencyClient: true, clientName: 'Client Alpha', jobsCount: 0 }
+  { id: 'ws-main', name: 'Основной воркспейс', slug: 'main-workspace', isAgencyClient: false, jobsCount: 0 }
 ];
 
-export const INITIAL_USER: UserProfile = {
-  id: 'user-001',
-  email: 'founder@repurposeflow.io',
-  name: 'Expert Founder',
-  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  plan: 'pro',
-  minutesTotal: 360,
-  minutesUsed: 0,
-  workspaces: INITIAL_WORKSPACES,
-  activeWorkspaceId: 'ws-personal'
-};
+export function createFreshUser(): UserProfile {
+  let uid = 'usr-' + Math.random().toString(36).substring(2, 9);
+  if (typeof window !== 'undefined') {
+    const existingUid = localStorage.getItem('repurposeflow_user_id');
+    if (existingUid) {
+      uid = existingUid;
+    } else {
+      localStorage.setItem('repurposeflow_user_id', uid);
+    }
+  }
+
+  return {
+    id: uid,
+    email: '',
+    name: 'Мой профиль',
+    avatarUrl: '',
+    plan: 'pro',
+    minutesTotal: 360,
+    minutesUsed: 0,
+    workspaces: [
+      { id: `ws-${uid.slice(0, 6)}`, name: 'Личный воркспейс', slug: 'my-workspace', isAgencyClient: false, jobsCount: 0 }
+    ],
+    activeWorkspaceId: `ws-${uid.slice(0, 6)}`
+  };
+}
 
 export function getStoredJobs(): MediaJob[] {
   if (typeof window === 'undefined') return [];
@@ -40,16 +53,17 @@ export function saveStoredJobs(jobs: MediaJob[]) {
 }
 
 export function getStoredUser(): UserProfile {
-  if (typeof window === 'undefined') return INITIAL_USER;
+  if (typeof window === 'undefined') return createFreshUser();
   try {
     const raw = localStorage.getItem('repurposeflow_user');
     if (!raw) {
-      localStorage.setItem('repurposeflow_user', JSON.stringify(INITIAL_USER));
-      return INITIAL_USER;
+      const fresh = createFreshUser();
+      localStorage.setItem('repurposeflow_user', JSON.stringify(fresh));
+      return fresh;
     }
     return JSON.parse(raw);
   } catch {
-    return INITIAL_USER;
+    return createFreshUser();
   }
 }
 

@@ -21,10 +21,13 @@ import {
   Volume2,
   VolumeX,
   Layers,
-  Radio
+  Radio,
+  FileAudio,
+  CheckCircle2,
+  Sliders,
+  ChevronRight
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { ThreeAudioSphere } from '@/components/ThreeAudioSphere';
 import { audioEngine } from '@/lib/audioEngine';
 
 interface LandingPageProps {
@@ -84,15 +87,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
     <div className="min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500 selection:text-black">
       {/* Background ambient lighting */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[600px] bg-gradient-to-b from-cyan-600/15 via-indigo-600/10 to-transparent blur-3xl opacity-70" />
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[600px] bg-gradient-to-b from-cyan-600/15 via-indigo-600/10 to-transparent blur-3xl opacity-70 animate-pulse-glow" />
         <div className="absolute top-[40%] -left-48 w-[600px] h-[600px] bg-sky-500/10 blur-3xl rounded-full" />
         <div className="absolute top-[65%] -right-48 w-[600px] h-[600px] bg-purple-500/10 blur-3xl rounded-full" />
       </div>
 
-      {/* Hero Section with 3D Core */}
+      {/* Hero Section */}
       <section className="relative pt-16 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
         {/* Glow Pill Badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl text-xs font-semibold text-slate-300 mb-6 shadow-inner">
+        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl text-xs font-semibold text-slate-300 mb-6 shadow-inner hover:border-cyan-500/30 transition-all">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
           <span className="text-white">{t.heroBadge}</span>
           <span className="text-slate-600">•</span>
@@ -115,14 +118,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           {t.heroSubtitle}
         </p>
 
-        {/* Interactive 3D Holographic Core */}
-        <div className="my-8 max-w-sm sm:max-w-md mx-auto relative group">
-          <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/15 via-indigo-500/10 to-transparent blur-2xl rounded-full pointer-events-none" />
-          <div className="relative z-10 h-[280px] sm:h-[340px] flex items-center justify-center">
-            <ThreeAudioSphere isPlaying={isPlaying} />
-          </div>
-          <div className="text-[11px] font-mono text-cyan-400/80 -mt-2">
-            ✦ Интерактивное 3D-ядро медиапотока (подвигайте курсором)
+        {/* Animated Interactive Pipeline Flow Visualizer */}
+        <div className="my-10 max-w-3xl mx-auto p-5 rounded-3xl bg-[#080C14]/80 border border-white/[0.08] shadow-2xl relative overflow-hidden backdrop-blur-xl group hover:border-cyan-500/30 transition-all duration-300">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Source */}
+            <div className="flex items-center gap-3 bg-[#030712] px-4 py-3 rounded-2xl border border-white/[0.07] w-full sm:w-auto">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                <FileAudio className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="text-left">
+                <div className="text-xs font-bold text-white">Исходная запись</div>
+                <div className="text-[11px] text-slate-400 font-mono">MP3, MP4, YouTube</div>
+              </div>
+            </div>
+
+            {/* Middle AI Transformation Engine */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-xs font-bold shadow-lg shadow-cyan-500/10">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '4s' }} />
+              <span>Gemini Engine</span>
+              <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
+            </div>
+
+            {/* Output Tags */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 w-full sm:w-auto">
+              {['LinkedIn', 'VC.ru', 'Reels', 'Telegram', 'Email', 'Quotes'].map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-white/[0.05] text-slate-200 border border-white/[0.08] hover:border-cyan-400/50 hover:text-cyan-300 transition-all hover:scale-105 cursor-default"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -130,7 +157,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={onStart}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-base shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-base shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center justify-center gap-2"
           >
             <Zap className="w-5 h-5 text-white" />
             <span>{t.heroCtaPrimary}</span>
@@ -138,7 +165,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           </button>
           <button
             onClick={togglePlayAudio}
-            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 font-semibold text-base transition-all flex items-center justify-center gap-2.5"
+            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-cyan-500/30 text-slate-200 font-semibold text-base transition-all hover:scale-[1.03] active:scale-[0.97] flex items-center justify-center gap-2.5"
           >
             {isPlaying ? (
               <>
@@ -170,7 +197,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         {/* Bento Interactive Simulator Card with REAL Audio Playback */}
         <div
           id="demo-section"
-          className="mt-16 text-left max-w-5xl mx-auto rounded-3xl bg-[#080C14]/90 border border-white/[0.08] shadow-2xl p-6 sm:p-8 backdrop-blur-2xl relative overflow-hidden"
+          className="mt-16 text-left max-w-5xl mx-auto rounded-3xl bg-[#080C14]/90 border border-white/[0.08] shadow-2xl p-6 sm:p-8 backdrop-blur-2xl relative overflow-hidden group hover:border-cyan-500/30 transition-all duration-300"
         >
           <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 blur-3xl pointer-events-none rounded-full" />
 
@@ -186,14 +213,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <p className="text-xs text-slate-400 mt-0.5">{t.demoSource}</p>
             </div>
 
-            {/* Simulated Audio Waveform Bar with REAL Playback */}
+            {/* Audio Waveform Bar with REAL Playback */}
             <div className="flex items-center gap-4 bg-[#030712] px-4 py-2.5 rounded-2xl border border-white/[0.08]">
               <button
                 onClick={togglePlayAudio}
-                className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition ${
+                className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition hover:scale-105 active:scale-95 ${
                   isPlaying
-                    ? 'bg-red-500 hover:bg-red-400 text-white'
-                    : 'bg-cyan-500 hover:bg-cyan-400 text-black'
+                    ? 'bg-red-500 hover:bg-red-400 text-white shadow-red-500/25'
+                    : 'bg-cyan-500 hover:bg-cyan-400 text-black shadow-cyan-500/25'
                 }`}
                 title={isPlaying ? 'Пауза' : 'Включить реальный звук подкаста'}
               >
@@ -230,7 +257,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
           {/* Sound playback notice */}
           {isPlaying && (
-            <div className="mt-3 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-cyan-300 flex items-center gap-2">
+            <div className="mt-3 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-cyan-300 flex items-center gap-2 animate-fade-in">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
               <span>{t.demoAudioPlaying}</span>
             </div>
@@ -241,9 +268,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <div className="flex flex-wrap gap-2 border-b border-white/[0.06] pb-3">
               <button
                 onClick={() => setActivePreviewTab('linkedin')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition hover:scale-105 active:scale-95 ${
                   activePreviewTab === 'linkedin'
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-lg shadow-cyan-500/10'
                     : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -251,9 +278,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </button>
               <button
                 onClick={() => setActivePreviewTab('vc')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition hover:scale-105 active:scale-95 ${
                   activePreviewTab === 'vc'
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-lg shadow-cyan-500/10'
                     : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -261,9 +288,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </button>
               <button
                 onClick={() => setActivePreviewTab('reels')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition hover:scale-105 active:scale-95 ${
                   activePreviewTab === 'reels'
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-lg shadow-cyan-500/10'
                     : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -271,9 +298,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </button>
               <button
                 onClick={() => setActivePreviewTab('telegram')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition hover:scale-105 active:scale-95 ${
                   activePreviewTab === 'telegram'
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-lg shadow-cyan-500/10'
                     : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
@@ -401,7 +428,7 @@ Gemini processes that raw conversation in 3 minutes:
               </span>
               <button
                 onClick={onStart}
-                className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold transition flex items-center gap-1.5 shadow-md"
+                className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 shadow-md shadow-cyan-500/20"
               >
                 <span>{t.demoOpenInStudio}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -475,10 +502,10 @@ Gemini processes that raw conversation in 3 minutes:
           ].map((item, idx) => (
             <div
               key={idx}
-              className={`p-6 rounded-3xl bg-[#080C14]/70 border border-white/[0.07] ${item.border} hover:bg-[#0B0F19] transition-all duration-300 group`}
+              className={`p-6 rounded-3xl bg-[#080C14]/70 border border-white/[0.07] ${item.border} hover:bg-[#0B0F19] hover:-translate-y-1.5 transition-all duration-300 group cursor-default shadow-lg shadow-black/40`}
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center group-hover:scale-110 group-hover:border-cyan-500/40 transition-all duration-300">
                   <item.icon className={`w-5 h-5 ${item.color}`} />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/[0.05] text-slate-300">
@@ -531,7 +558,7 @@ Gemini processes that raw conversation in 3 minutes:
           </div>
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-            <div className="p-5 rounded-2xl bg-[#030712] border border-white/[0.06]">
+            <div className="p-5 rounded-2xl bg-[#030712] border border-white/[0.06] hover:border-cyan-500/30 transition-all hover:-translate-y-1">
               <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs mb-1">
                 <Clock className="w-4 h-4 text-cyan-400" /> {t.calcHoursSaved}
               </div>
@@ -539,7 +566,7 @@ Gemini processes that raw conversation in 3 minutes:
               <div className="text-[11px] text-slate-500 mt-1">{t.calcHoursSub}</div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#030712] border border-white/[0.06]">
+            <div className="p-5 rounded-2xl bg-[#030712] border border-white/[0.06] hover:border-emerald-500/30 transition-all hover:-translate-y-1">
               <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs mb-1">
                 <DollarSign className="w-4 h-4 text-emerald-400" /> {t.calcCostSaved}
               </div>
@@ -549,7 +576,7 @@ Gemini processes that raw conversation in 3 minutes:
               <div className="text-[11px] text-slate-500 mt-1">{t.calcCostSub}</div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#030712] border border-white/[0.06]">
+            <div className="p-5 rounded-2xl bg-[#030712] border border-white/[0.06] hover:border-purple-500/30 transition-all hover:-translate-y-1">
               <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs mb-1">
                 <TrendingUp className="w-4 h-4 text-purple-400" /> {t.calcReachGrowth}
               </div>
@@ -560,7 +587,7 @@ Gemini processes that raw conversation in 3 minutes:
         </div>
       </section>
 
-      {/* FAQ Accordion */}
+      {/* FAQ Accordion with smooth height animation */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-white/[0.06]">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold text-white">{t.faqTitle}</h2>
@@ -576,21 +603,21 @@ Gemini processes that raw conversation in 3 minutes:
           ].map((item, idx) => (
             <div
               key={idx}
-              className="rounded-2xl bg-[#080C14] border border-white/[0.06] overflow-hidden"
+              className="rounded-2xl bg-[#080C14] border border-white/[0.06] hover:border-white/[0.15] transition-all overflow-hidden"
             >
               <button
                 onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4 focus:outline-none"
+                className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4 focus:outline-none transition-colors"
               >
                 <span className="text-sm font-semibold text-white">{item.q}</span>
                 <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform ${
+                  className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${
                     openFaq === idx ? 'rotate-180 text-cyan-400' : ''
                   }`}
                 />
               </button>
               {openFaq === idx && (
-                <div className="px-6 pb-5 text-xs sm:text-sm text-slate-300/90 leading-relaxed border-t border-white/[0.04] pt-3">
+                <div className="px-6 pb-5 text-xs sm:text-sm text-slate-300/90 leading-relaxed border-t border-white/[0.04] pt-3 animate-fade-in">
                   {item.a}
                 </div>
               )}
@@ -611,7 +638,7 @@ Gemini processes that raw conversation in 3 minutes:
           <div className="mt-6 flex justify-center">
             <button
               onClick={onStart}
-              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 text-white font-bold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105 transition-all"
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 text-white font-bold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all"
             >
               {t.footerCta}
             </button>
