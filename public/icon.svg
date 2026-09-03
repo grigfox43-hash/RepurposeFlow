@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="rf-border" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+    <linearGradient id="rf-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#06B6D4" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Outer Squircle with Gradient Border -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="#080C14" stroke="url(#rf-border)" stroke-width="2.5" />
+
+  <!-- Radio Waves Broadcast Logo -->
+  <g stroke="url(#rf-glow)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glow)">
+    <!-- Outer wave right -->
+    <path d="M44 18 a 20 20 0 0 1 0 28" />
+    <!-- Inner wave right -->
+    <path d="M38 24 a 12 12 0 0 1 0 16" />
+
+    <!-- Outer wave left -->
+    <path d="M20 46 a 20 20 0 0 1 0 -28" />
+    <!-- Inner wave left -->
+    <path d="M26 40 a 12 12 0 0 1 0 -16" />
+
+    <!-- Center Transmitter Core Dot -->
+    <circle cx="32" cy="32" r="3.5" fill="#22D3EE" stroke="#080C14" stroke-width="1.5" />
+  </g>
+</svg>

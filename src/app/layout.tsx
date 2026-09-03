@@ -17,7 +17,9 @@ export const metadata: Metadata = {
   description:
     'Медиа-комбайн на базе Gemini. Автоматическая дистрибуция контента в LinkedIn, VC.ru, Reels, Telegram и Email.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
 };
 

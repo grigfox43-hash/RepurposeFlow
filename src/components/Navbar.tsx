@@ -3,37 +3,39 @@
 import React, { useState } from 'react';
 import {
   Sparkles,
-  Layers,
   Settings,
-  ChevronDown,
   Plus,
-  Radio,
+  Layers,
+  ChevronDown,
+  User,
   Zap,
-  User
+  Radio,
+  LogIn
 } from 'lucide-react';
-import { UserProfile, Workspace } from '@/types';
+import { Workspace, UserProfile } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import { FlagRU, FlagUS } from './FlagIcons';
 
 interface NavbarProps {
-  currentView: 'landing' | 'dashboard' | 'studio';
-  onNavigate: (view: 'landing' | 'dashboard' | 'studio') => void;
   user: UserProfile;
   activeWorkspace: Workspace;
-  onSelectWorkspace: (wsId: string) => void;
+  onSelectWorkspace: (workspaceId: string) => void;
   onOpenUpload: () => void;
   onOpenSettings: () => void;
   onOpenCabinet: () => void;
+  onNavigate: (view: 'landing' | 'dashboard' | 'studio') => void;
+  currentView: 'landing' | 'dashboard' | 'studio';
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  currentView,
-  onNavigate,
   user,
   activeWorkspace,
   onSelectWorkspace,
   onOpenUpload,
   onOpenSettings,
-  onOpenCabinet
+  onOpenCabinet,
+  onNavigate,
+  currentView
 }) => {
   const { language, setLanguage, t } = useLanguage();
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
@@ -44,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#030712]/85 backdrop-blur-2xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Logo & Brand */}
+        {/* Left Side: Brand Logo */}
         <div className="flex items-center gap-6">
           <button
             onClick={() => onNavigate('landing')}
@@ -92,26 +94,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
         </div>
 
-        {/* Right side tools: Language Flags Switcher, Workspace, Quota, Personal Cabinet, CTA */}
+        {/* Right side tools: Language Flags Switcher, Workspace, Quota, Personal Cabinet / Login, CTA */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Flag Language Switcher */}
+          {/* Flag Language Switcher with Real Crisp SVG Vector Flags */}
           <div className="relative">
             <button
               onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.2] transition text-xs text-slate-200"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/30 hover:bg-white/[0.07] transition text-xs text-slate-200"
               title="Переключить язык / Switch Language"
             >
-              <span className="text-base leading-none">
-                {language === 'ru' ? '🇷🇺' : '🇺🇸'}
-              </span>
-              <span className="font-bold text-[11px] uppercase tracking-wider">
+              {language === 'ru' ? <FlagRU className="w-5 h-3.5" /> : <FlagUS className="w-5 h-3.5" />}
+              <span className="font-bold text-[11px] tracking-wider uppercase text-slate-300">
                 {language === 'ru' ? 'RU' : 'EN'}
               </span>
               <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {langMenuOpen && (
-              <div className="absolute right-0 mt-2 w-36 rounded-2xl bg-[#0B0F19] border border-white/[0.12] shadow-2xl p-1.5 z-50">
+              <div className="absolute right-0 mt-2 w-40 rounded-2xl bg-[#0B0F19] border border-white/[0.12] shadow-2xl p-1.5 z-50 animate-fade-in">
                 <button
                   onClick={() => {
                     setLanguage('ru');
@@ -123,7 +123,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-slate-300 hover:bg-white/[0.05]'
                   }`}
                 >
-                  <span className="text-base">🇷🇺</span>
+                  <FlagRU className="w-5 h-3.5 shrink-0" />
                   <span>Русский</span>
                 </button>
                 <button
@@ -137,7 +137,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-slate-300 hover:bg-white/[0.05]'
                   }`}
                 >
-                  <span className="text-base">🇺🇸</span>
+                  <FlagUS className="w-5 h-3.5 shrink-0" />
                   <span>English</span>
                 </button>
               </div>
@@ -145,22 +145,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Workspace Switcher */}
-          <div className="relative hidden lg:block">
-            <button
-              onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-xs text-slate-300 hover:border-white/[0.2] transition"
-            >
-              <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-medium max-w-[130px] truncate">{activeWorkspace.name}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
+          {user.isAuthenticated && (
+            <div className="relative hidden lg:block">
+              <button
+                onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-xs text-slate-300 hover:border-white/[0.2] transition"
+              >
+                <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="font-medium max-w-[130px] truncate">{activeWorkspace?.name || 'Личный'}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
 
-            {workspaceMenuOpen && (
-              <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-[#0B0F19] border border-white/[0.12] shadow-2xl p-2 z-50">
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  {t.navWorkspaces}
-                </div>
-                <div className="space-y-1 mt-1">
+              {workspaceMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#0B0F19] border border-white/[0.12] shadow-2xl p-1.5 z-50 animate-fade-in">
+                  <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {t.navWorkspaces}
+                  </div>
                   {user.workspaces.map((ws) => (
                     <button
                       key={ws.id}
@@ -168,9 +168,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                         onSelectWorkspace(ws.id);
                         setWorkspaceMenuOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs text-left transition ${
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition ${
                         ws.id === activeWorkspace.id
-                          ? 'bg-cyan-500/20 text-cyan-300 font-bold'
+                          ? 'bg-cyan-500/20 text-cyan-300'
                           : 'text-slate-300 hover:bg-white/[0.05]'
                       }`}
                     >
@@ -183,9 +183,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Minute meter */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
@@ -193,21 +193,31 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-slate-300 font-mono font-semibold">{minutesLeft} мин</span>
           </div>
 
-          {/* Personal Cabinet Avatar Trigger */}
-          <button
-            onClick={onOpenCabinet}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/40 hover:bg-white/[0.07] transition text-xs text-slate-200 group"
-            title={t.navAccount}
-          >
-            <div className="w-6 h-6 rounded-full overflow-hidden bg-cyan-500/20 flex items-center justify-center shrink-0">
-              {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                <User className="w-3.5 h-3.5 text-cyan-400" />
-              )}
-            </div>
-            <span className="hidden sm:inline font-medium max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
-          </button>
+          {/* Personal Cabinet OR Login Button */}
+          {user.isAuthenticated ? (
+            <button
+              onClick={onOpenCabinet}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/40 hover:bg-white/[0.07] transition text-xs text-slate-200 group"
+              title="Личный кабинет"
+            >
+              <div className="w-6 h-6 rounded-full overflow-hidden bg-cyan-500/20 flex items-center justify-center shrink-0 border border-cyan-500/40">
+                <span className="text-[11px] font-bold text-cyan-300">
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </div>
+              <span className="hidden sm:inline font-medium max-w-[100px] truncate">
+                {user.name || 'Профиль'}
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={onOpenCabinet}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] hover:border-cyan-500/40 transition text-xs font-semibold text-slate-200 hover:text-white"
+            >
+              <LogIn className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{language === 'ru' ? 'Войти' : 'Sign In'}</span>
+            </button>
+          )}
 
           {/* Settings Trigger */}
           <button

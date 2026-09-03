@@ -94,6 +94,7 @@ export interface UserProfile {
   minutesUsed: number;
   workspaces: Workspace[];
   activeWorkspaceId: string;
+  isAuthenticated?: boolean;
 }
 
 export interface PlanDetails {
