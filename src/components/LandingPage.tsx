@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   Play,
@@ -18,12 +18,14 @@ import {
   Mail,
   Quote,
   ChevronDown,
+  Volume2,
+  VolumeX,
   Layers,
-  Radio,
-  Sliders,
-  CheckCircle2
+  Radio
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { ThreeAudioSphere } from '@/components/ThreeAudioSphere';
+import { audioEngine } from '@/lib/audioEngine';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -35,9 +37,48 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const [activePreviewTab, setActivePreviewTab] = useState<'linkedin' | 'vc' | 'reels' | 'telegram'>('linkedin');
   const [episodesPerMonth, setEpisodesPerMonth] = useState<number>(4);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [audioSeconds, setAudioSeconds] = useState(0);
 
   const hoursSaved = episodesPerMonth * 3.5;
   const costSaved = episodesPerMonth * 220;
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      audioEngine.stop();
+    };
+  }, []);
+
+  const togglePlayAudio = () => {
+    if (isPlaying) {
+      audioEngine.stop();
+      setIsPlaying(false);
+    } else {
+      setIsPlaying(true);
+      const sampleText =
+        language === 'ru'
+          ? 'Анатомия B2B-контента: от нуля до ста тысяч долларов ARR без платной рекламы. Как превратить один созвон в 15 готовых публикаций.'
+          : 'B2B content engine: from 0 to 100k ARR without paid ads. How to turn one founder call into 15 social posts.';
+
+      audioEngine.start(
+        sampleText,
+        language,
+        (seconds) => {
+          setAudioSeconds(seconds);
+        },
+        () => {
+          setIsPlaying(false);
+          setAudioSeconds(0);
+        }
+      );
+    }
+  };
+
+  const formatAudioTime = (sec: number) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   return (
     <div className="min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500 selection:text-black">
@@ -48,10 +89,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         <div className="absolute top-[65%] -right-48 w-[600px] h-[600px] bg-purple-500/10 blur-3xl rounded-full" />
       </div>
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+      {/* Hero Section with 3D Core */}
+      <section className="relative pt-16 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
         {/* Glow Pill Badge */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl text-xs font-semibold text-slate-300 mb-8 shadow-inner">
+        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl text-xs font-semibold text-slate-300 mb-6 shadow-inner">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
           <span className="text-white">{t.heroBadge}</span>
           <span className="text-slate-600">•</span>
@@ -74,8 +115,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           {t.heroSubtitle}
         </p>
 
+        {/* Interactive 3D Holographic Core */}
+        <div className="my-8 max-w-sm sm:max-w-md mx-auto relative group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/15 via-indigo-500/10 to-transparent blur-2xl rounded-full pointer-events-none" />
+          <div className="relative z-10 h-[280px] sm:h-[340px] flex items-center justify-center">
+            <ThreeAudioSphere isPlaying={isPlaying} />
+          </div>
+          <div className="text-[11px] font-mono text-cyan-400/80 -mt-2">
+            ✦ Интерактивное 3D-ядро медиапотока (подвигайте курсором)
+          </div>
+        </div>
+
         {/* CTA Buttons */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={onStart}
             className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-base shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
@@ -84,13 +136,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <span>{t.heroCtaPrimary}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
-          <a
-            href="#demo-section"
-            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 font-semibold text-base transition-all flex items-center justify-center gap-2"
+          <button
+            onClick={togglePlayAudio}
+            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 font-semibold text-base transition-all flex items-center justify-center gap-2.5"
           >
-            <Play className="w-4 h-4 text-cyan-400" />
-            <span>{t.heroCtaSecondary}</span>
-          </a>
+            {isPlaying ? (
+              <>
+                <Pause className="w-4 h-4 text-cyan-400" />
+                <span>Остановить звук</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" />
+                <span>{t.heroCtaSecondary}</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Feature Checkmarks */}
@@ -106,7 +167,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           </div>
         </div>
 
-        {/* Bento Interactive Simulator Card */}
+        {/* Bento Interactive Simulator Card with REAL Audio Playback */}
         <div
           id="demo-section"
           className="mt-16 text-left max-w-5xl mx-auto rounded-3xl bg-[#080C14]/90 border border-white/[0.08] shadow-2xl p-6 sm:p-8 backdrop-blur-2xl relative overflow-hidden"
@@ -125,13 +186,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <p className="text-xs text-slate-400 mt-0.5">{t.demoSource}</p>
             </div>
 
-            {/* Simulated Audio Waveform Bar */}
+            {/* Simulated Audio Waveform Bar with REAL Playback */}
             <div className="flex items-center gap-4 bg-[#030712] px-4 py-2.5 rounded-2xl border border-white/[0.08]">
               <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="w-10 h-10 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black flex items-center justify-center shadow-lg transition"
+                onClick={togglePlayAudio}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition ${
+                  isPlaying
+                    ? 'bg-red-500 hover:bg-red-400 text-white'
+                    : 'bg-cyan-500 hover:bg-cyan-400 text-black'
+                }`}
+                title={isPlaying ? 'Пауза' : 'Включить реальный звук подкаста'}
               >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5 fill-current" />}
               </button>
               <div>
                 <div className="flex items-center gap-1 h-6">
@@ -141,17 +207,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       className={`w-1 rounded-full transition-all duration-300 ${
                         isPlaying ? 'bg-cyan-400 animate-pulse' : 'bg-slate-700'
                       }`}
-                      style={{ height: `${h}%` }}
+                      style={{ height: isPlaying ? `${Math.min(100, Math.max(25, (h + (audioSeconds * 12) % 60)))}%` : `${h}%` }}
                     />
                   ))}
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
-                  <span>{isPlaying ? '04:15' : '00:00'}</span>
+                  <span className={isPlaying ? 'text-cyan-400 font-bold' : ''}>
+                    {formatAudioTime(audioSeconds)}
+                  </span>
                   <span>32:00</span>
                 </div>
               </div>
+              <div className="pl-2 border-l border-white/[0.08]">
+                {isPlaying ? (
+                  <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" />
+                ) : (
+                  <VolumeX className="w-4 h-4 text-slate-600" />
+                )}
+              </div>
             </div>
           </div>
+
+          {/* Sound playback notice */}
+          {isPlaying && (
+            <div className="mt-3 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-xs text-cyan-300 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <span>{t.demoAudioPlaying}</span>
+            </div>
+          )}
 
           {/* Tab buttons */}
           <div className="mt-6 relative z-10">
@@ -198,7 +281,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </button>
             </div>
 
-            {/* Live Preview Text Box */}
+            {/* Live Preview Text Box with custom sleek designer scrollbar */}
             <div className="mt-4 p-5 rounded-2xl bg-[#030712]/90 border border-white/[0.06] font-sans text-sm text-slate-300 leading-relaxed max-h-[300px] overflow-y-auto whitespace-pre-line select-text">
               {language === 'ru' ? (
                 activePreviewTab === 'linkedin' ? (
@@ -225,7 +308,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 ## Инсайт недели:
 Настоящий экспертный маркетинг скрыт в ваших внутренних созвонах. Каждую неделю команда проговаривает десятки часов живой экспертизы. 
 
-Мультимодальный Google Gemini за 3 минуты:
+Мультимодальный Gemini за 3 минуты:
 1. Вычленяет главную драматургию и цифры
 2. Формирует структуру: Факап ➔ Решение ➔ Прикладная методика
 3. Упаковывает материал в готовый лонгрид с высоким индексом вовлечения.`
@@ -239,7 +322,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 «Мы сняли красивую студию, позвали гостя, выложили на YouTube и ждали чуда. Алгоритмы нас просто проигнорировали. Почему? Потому что длинные видео без нарезки на короткие хуки в 2026 году не смотрят.»
 
 [00:15 - 00:24] РЕШЕНИЕ:
-«Мы загрузили это аудио в RepurposeFlow на базе Google Gemini, получили 3 готовых 30-секундных сценария с хуками, выложили их в Reels и за неделю собрали 380 000 просмотров!»
+«Мы загрузили это аудио в RepurposeFlow на базе Gemini, получили 3 готовых 30-секундных сценария с хуками, выложили их в Reels и за неделю собрали 380 000 просмотров!»
 
 [00:24 - 00:28] CTA:
 «Попробуй прямо сейчас в нашем приложении!»`
@@ -250,7 +333,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
 1️⃣ **Забудьте про приветствия.** Первое предложение обязано ломать стереотип.
 2️⃣ **Созвоны с клиентами — золотая жила.** Там живой язык и реальные боли.
-3️⃣ **1 разговор = 15 постов.** Автоматизируйте дистрибуцию через Google Gemini.
+3️⃣ **1 разговор = 15 постов.** Автоматизируйте дистрибуцию через Gemini.
 
 📊 **Статистика:** время создания контент-плана сократилось с 12 часов до 3 минут.`
                 )
@@ -279,7 +362,7 @@ Most founders make a fatal mistake: hiring junior copywriters who produce generi
 ## The Core Breakthrough:
 Authentic B2B marketing is locked inside your private Zoom calls. Every week, your engineers explain breakthrough solutions. 
 
-Google Gemini processes that raw conversation in 3 minutes:
+Gemini processes that raw conversation in 3 minutes:
 1. Surfaces hidden drama, metrics, and quotes
 2. Formats actionable framework: Mistake ➔ Solution ➔ Step-by-Step
 3. Packages ready-to-publish articles.`
@@ -293,7 +376,7 @@ Google Gemini processes that raw conversation in 3 minutes:
 "You spend $2,000 on an agency that writes 1 generic post a week. Meanwhile, your phone has 10 hours of customer calls with all the exact objections and answers."
 
 [00:15 - 00:24] SOLUTION:
-"Upload that call to RepurposeFlow. Google Gemini generates 3 short-form scripts and carousels in your exact voice."
+"Upload that call to RepurposeFlow. Gemini generates 3 short-form scripts and carousels in your exact voice."
 
 [00:24 - 00:28] CTA:
 "Try it free in our app today!"`
@@ -304,7 +387,7 @@ Google Gemini processes that raw conversation in 3 minutes:
 
 1️⃣ **No filler introductions.** The first 3 seconds must break a misconception.
 2️⃣ **Customer calls are pure gold.** Live banter beats scripted copy every single time.
-3️⃣ **1 Call = 15 Social Posts.** Streamline your engine with Google Gemini.
+3️⃣ **1 Call = 15 Social Posts.** Streamline your engine with Gemini.
 
 📊 **Result:** Content production time slashed from 12 hours to 3 minutes.`
                 )

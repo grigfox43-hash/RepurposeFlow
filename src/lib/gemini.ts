@@ -102,7 +102,7 @@ export const FORMAT_DEFINITIONS: Record<FormatType, { title: string; platform: C
 };
 
 /**
- * Calls Google Gemini API with the working gemini-3.6-flash model,
+ * Calls Gemini API with the working gemini-3.6-flash model,
  * strictly without outputting any version numbers in user-facing texts.
  */
 export async function generateContentWithGemini({
@@ -159,7 +159,7 @@ export async function generateContentWithGemini({
       id: `item-${fmt}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       formatType: fmt,
       title: meta.title,
-      subtitle: `Создано Google Gemini AI`,
+      subtitle: `Создано Gemini AI`,
       content,
       badge: meta.badge,
       platform: meta.platform,
@@ -194,7 +194,7 @@ async function callGeminiApi({
   formats: FormatType[];
   language: 'ru' | 'en' | 'auto';
 }): Promise<ContentItem[]> {
-  const prompt = `Ты — ведущий контент-стратег и копирайтер RepurposeFlow, использующий модель Google Gemini.
+  const prompt = `Ты — ведущий контент-стратег и копирайтер RepurposeFlow, использующий модель Gemini.
 Твоя задача — взять аудио-транскрипт или тему подкаста/созвона и создать вирусные, готовые к публикации посты для выбранных форматов.
 
 Входные данные:
@@ -214,7 +214,7 @@ ${TONE_PROMPTS[tone]}
 Запрошенные форматы: ${formats.join(', ')}.
 
 Каждый текст должен быть полностью завершенным, с хуками, эмодзи (где уместно), структурными абзацами и призывами к действию (CTA).
-Не указывай в тексте номера версий нейросетей, пиши просто 'Google Gemini' или 'Gemini AI'.`;
+Не указывай в тексте номера версий нейросетей, пиши просто 'Gemini' или 'Gemini AI'.`;
 
   // Use the verified gemini-3.6-flash model
   const targetModel = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
@@ -255,7 +255,7 @@ ${TONE_PROMPTS[tone]}
       id: `item-${entry.formatType}-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
       formatType: entry.formatType,
       title: meta.title,
-      subtitle: `Google Gemini AI`,
+      subtitle: `Gemini AI`,
       content: entry.content,
       badge: meta.badge,
       platform: meta.platform,
@@ -296,7 +296,7 @@ function generateSampleTranscript(title: string, language: string): string {
     return `[00:00] Welcome everyone to today's deep-dive session on "${title}".
 [00:25] The single biggest mistake most founders make is trying to scale before building repeatable distribution.
 [01:10] In our experiments, we turned 1 long podcast into 15 high-performing assets across LinkedIn, Twitter, and YouTube Shorts.
-[02:05] The breakthrough happened when we automated transcription and prompt-chaining with Google Gemini.
+[02:05] The breakthrough happened when we automated transcription and prompt-chaining with Gemini.
 [03:15] You don't need a team of 5 junior copywriters. You need one sharp editor and an intelligent AI pipeline.
 [04:40] Here is the step-by-step formula we used to generate over 250,000 organic impressions in 30 days.`;
   }
@@ -304,7 +304,7 @@ function generateSampleTranscript(title: string, language: string): string {
   return `[00:00] Привет всем! Сегодня мы разбираем тему: "${title}".
 [00:35] Главная ошибка большинства фаундеров и экспертов — записывать часовой подкаст или созвон с клиентом и просто положить его в архив.
 [01:15] Контент без дистрибуции мертв. Вы потратили 60 минут на запись, но если из этого не сделано 10-15 постов в разные каналы — вы потеряли 90% охвата.
-[02:10] Мы провели эксперимент: взяли одно интервью и прогнали его через мультимодальный Google Gemini. На выходе: лонгрид на VC.ru, 3 сценария Reels с хуками на первые 3 секунды и карусель в LinkedIn.
+[02:10] Мы провели эксперимент: взяли одно интервью и прогнали его через мультимодальный Gemini. На выходе: лонгрид на VC.ru, 3 сценария Reels с хуками на первые 3 секунды и карусель в LinkedIn.
 [03:45] Результат: этот выпуск принес в 8 раз больше лидов, чем просто ссылка на YouTube.
 [05:20] Главный инсайт: делайте ставку на сильный хук в первые 3 секунды видео и четкую структуру «проблема -> факап -> методология -> призыв».`;
 }
@@ -415,7 +415,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 «Вы тратите 80 000 рублей на команду, которая раз в неделю вымучивает пост. А в это время в вашем телефоне лежат записи созвонов с клиентами на 5 часов! Там уже есть все ответы, все боли и готовые кейсы.»
 
 [00:15 - 00:24] РЕШЕНИЕ:
-«Загружаете это видео в RepurposeFlow на базе Google Gemini. За 3 минуты получаете 15 готовых сценариев и тредов, написанных вашим же голосом.»
+«Загружаете это видео в RepurposeFlow на базе Gemini. За 3 минуты получаете 15 готовых сценариев и тредов, написанных вашим же голосом.»
 
 [00:24 - 00:28] CTA:
 «Напишите слово "ПОТОК" в директ, и я пришлю ссылку на тест платформы!»
@@ -452,7 +452,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 
 ▫️ **Контент ради контента больше не работает.** Если в первые 5 секунд нет четкого ответа «зачем мне это читать/смотреть» — юзер скроллит дальше.
 ▫️ **Аудиосозвоны — это золотая жила.** В живом диалоге нет корпоративной цензуры и заученных фраз. Там живая речь, которая лучше всего продает.
-▫️ **Мультимодальные модели Google Gemini** теперь слышат интонации и акценты, вытаскивая самые сочные цитаты без ручной нарезки.
+▫️ **Мультимодальные модели Gemini** теперь слышат интонации и акценты, вытаскивая самые сочные цитаты без ручной нарезки.
 
 💡 **Цифра выпуска:** 3 минуты уходит на то, чтобы превратить 45-минутный созвон в контент-план на 14 дней.
 
@@ -475,7 +475,7 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 
 В выпуске «${title}» мы подробно разобрали:
 1. Как извлечь 15 единиц контента из одной аудиозаписи.
-2. Почему модели Google Gemini работают с длинным контекстом быстрее и точнее аналогов.
+2. Почему модели Gemini работают с длинным контекстом быстрее и точнее аналогов.
 3. Как настроить поток заявок, не тратя больше 15 минут в неделю на проверку текстов.
 
 👉 [Перейти к материалам выпуска]
@@ -499,5 +499,5 @@ What is your biggest roadblock in repurposing content? Drop a comment below 👇
 Стиль: ${tone}
 
 Ключевой инсайт:
-Создание контента больше не должно быть узким горлышком вашего бизнеса. С помощью Google Gemini один качественный подкаст масштабируется на все ключевые площадки за считанные минуты.`;
+Создание контента больше не должно быть узким горлышком вашего бизнеса. С помощью Gemini один качественный подкаст масштабируется на все ключевые площадки за считанные минуты.`;
 }

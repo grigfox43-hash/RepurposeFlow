@@ -7,6 +7,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const {
+      userId = 'user-001',
       title,
       sourceType,
       fileName,
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Call Google Gemini processor directly
+    // Call Gemini processor directly
     const { contentItems, transcript } = await generateContentWithGemini({
       title,
       tone: tone as ToneOfVoice,
@@ -60,6 +61,7 @@ export async function POST(req: Request) {
 
     const job: MediaJob = {
       id: jobId,
+      userId,
       workspaceId,
       title,
       sourceType,

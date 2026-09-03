@@ -1,7 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Sparkles, Layers, Settings, ChevronDown, Plus, Radio, Zap, Globe } from 'lucide-react';
+import {
+  Sparkles,
+  Layers,
+  Settings,
+  ChevronDown,
+  Plus,
+  Radio,
+  Zap,
+  User
+} from 'lucide-react';
 import { UserProfile, Workspace } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -13,6 +22,7 @@ interface NavbarProps {
   onSelectWorkspace: (wsId: string) => void;
   onOpenUpload: () => void;
   onOpenSettings: () => void;
+  onOpenCabinet: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -22,7 +32,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeWorkspace,
   onSelectWorkspace,
   onOpenUpload,
-  onOpenSettings
+  onOpenSettings,
+  onOpenCabinet
 }) => {
   const { language, setLanguage, t } = useLanguage();
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
@@ -50,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   Repurpose<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">Flow</span>
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-800/40 flex items-center gap-1">
-                  <Sparkles className="w-2.5 h-2.5 text-cyan-400" /> Google Gemini
+                  <Sparkles className="w-2.5 h-2.5 text-cyan-400" /> Gemini
                 </span>
               </div>
             </div>
@@ -81,8 +92,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
         </div>
 
-        {/* Right side tools: Language Flags Switcher, Workspace, Quota, CTA */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* Right side tools: Language Flags Switcher, Workspace, Quota, Personal Cabinet, CTA */}
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Flag Language Switcher */}
           <div className="relative">
             <button
@@ -100,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {langMenuOpen && (
-              <div className="absolute right-0 mt-2 w-36 rounded-2xl bg-[#0B0F19] border border-white/[0.12] shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute right-0 mt-2 w-36 rounded-2xl bg-[#0B0F19] border border-white/[0.12] shadow-2xl p-1.5 z-50">
                 <button
                   onClick={() => {
                     setLanguage('ru');
@@ -182,6 +193,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-slate-300 font-mono font-semibold">{minutesLeft} мин</span>
           </div>
 
+          {/* Personal Cabinet Avatar Trigger */}
+          <button
+            onClick={onOpenCabinet}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/40 hover:bg-white/[0.07] transition text-xs text-slate-200 group"
+            title={t.navAccount}
+          >
+            <div className="w-6 h-6 rounded-full overflow-hidden bg-cyan-500/20 flex items-center justify-center shrink-0">
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-3.5 h-3.5 text-cyan-400" />
+              )}
+            </div>
+            <span className="hidden sm:inline font-medium max-w-[100px] truncate">{user.name.split(' ')[0]}</span>
+          </button>
+
           {/* Settings Trigger */}
           <button
             onClick={onOpenSettings}
@@ -194,10 +221,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Primary CTA */}
           <button
             onClick={onOpenUpload}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-xs shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-xs shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span>{t.navRepurposeBtn}</span>
+            <span className="hidden sm:inline">{t.navRepurposeBtn}</span>
+            <span className="sm:hidden">+</span>
           </button>
         </div>
       </div>

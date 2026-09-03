@@ -8,6 +8,7 @@ import { UploadModal } from '@/components/UploadModal';
 import { ProcessingState } from '@/components/ProcessingState';
 import { StudioEditor } from '@/components/StudioEditor';
 import { SettingsModal } from '@/components/SettingsModal';
+import { PersonalCabinetModal } from '@/components/PersonalCabinetModal';
 import { LanguageProvider } from '@/context/LanguageContext';
 import {
   getStoredJobs,
@@ -27,6 +28,7 @@ function AppContent() {
   // Modals
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isCabinetOpen, setIsCabinetOpen] = useState(false);
 
   // Load jobs from real database API on mount
   useEffect(() => {
@@ -63,6 +65,14 @@ function AppContent() {
   const handleUpdateUser = (updatedUser: UserProfile) => {
     setUser(updatedUser);
     saveStoredUser(updatedUser);
+  };
+
+  const handleSwitchUser = (newUser: UserProfile) => {
+    setUser(newUser);
+    saveStoredUser(newUser);
+    // Find first job belonging to this user
+    const userFirstJob = jobs.find((j) => !j.userId || j.userId === newUser.id);
+    setActiveJob(userFirstJob || null);
   };
 
   const handleUpdateJobs = (updatedJobs: MediaJob[]) => {
@@ -125,13 +135,16 @@ function AppContent() {
     handleUpdateJobs(updatedJobs);
   };
 
+  const userJobsCount = jobs.filter((j) => !j.userId || j.userId === user.id).length;
+
   return (
     <div className="min-h-screen bg-[#030712] text-slate-100 font-sans">
       <Navbar
         currentView={currentView}
         onNavigate={(view) => {
           if (view === 'studio' && !activeJob && jobs.length > 0) {
-            setActiveJob(jobs[0]);
+            const userJob = jobs.find((j) => !j.userId || j.userId === user.id) || jobs[0];
+            setActiveJob(userJob);
           }
           setCurrentView(view);
         }}
@@ -140,6 +153,7 @@ function AppContent() {
         onSelectWorkspace={handleSelectWorkspace}
         onOpenUpload={() => setIsUploadOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenCabinet={() => setIsCabinetOpen(true)}
       />
 
       <main>
@@ -147,7 +161,8 @@ function AppContent() {
           <LandingPage
             onStart={() => {
               if (jobs.length > 0) {
-                setActiveJob(jobs[0]);
+                const userJob = jobs.find((j) => !j.userId || j.userId === user.id) || jobs[0];
+                setActiveJob(userJob);
                 setCurrentView('studio');
               } else {
                 setCurrentView('dashboard');
@@ -164,6 +179,7 @@ function AppContent() {
             onOpenUpload={() => setIsUploadOpen(true)}
             onOpenStudio={handleOpenStudio}
             onDeleteJob={handleDeleteJob}
+            onOpenCabinet={() => setIsCabinetOpen(true)}
           />
         )}
 
@@ -179,7 +195,7 @@ function AppContent() {
               />
             ) : (
               <div className="py-24 text-center text-slate-400">
-                <p>Нет выбранного проекта.</p>
+                <p>В вашем личном кабинете нет выбранного проекта.</p>
                 <button
                   onClick={() => setIsUploadOpen(true)}
                   className="mt-4 px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold transition"
@@ -204,6 +220,15 @@ function AppContent() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <PersonalCabinetModal
+        isOpen={isCabinetOpen}
+        onClose={() => setIsCabinetOpen(false)}
+        user={user}
+        onUpdateUser={handleUpdateUser}
+        onSwitchUser={handleSwitchUser}
+        totalUserJobs={userJobsCount}
       />
     </div>
   );

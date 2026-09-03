@@ -48,7 +48,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
             <div>
               <h2 className="text-lg font-bold text-white tracking-tight">Интеграции и настройки API</h2>
-              <p className="text-xs text-slate-400">Настройка Google Gemini, n8n и хранилища S3/R2</p>
+              <p className="text-xs text-slate-400">Настройка Gemini, n8n и хранилища S3/R2</p>
             </div>
           </div>
           <button
@@ -60,11 +60,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </div>
 
         <form onSubmit={handleSave} className="mt-6 space-y-5">
-          {/* Google Gemini API Key */}
+          {/* Gemini API Key */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Google Gemini API Key:
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Gemini API Key:
               </span>
               <a
                 href="https://aistudio.google.com/app/apikey"
@@ -72,7 +72,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 rel="noreferrer"
                 className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
               >
-                Google AI Studio <ExternalLink className="w-2.5 h-2.5" />
+                AI Studio <ExternalLink className="w-2.5 h-2.5" />
               </a>
             </label>
             <input
@@ -83,7 +83,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               className="w-full px-4 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white font-mono text-xs focus:outline-none focus:border-cyan-500"
             />
             <p className="text-[11px] text-slate-500 mt-1">
-              Ключ используется для прямых вызовов Google Gemini AI API с сервера или клиента.
+              Ключ используется для прямых вызовов Gemini AI API с сервера или клиента.
             </p>
           </div>
 

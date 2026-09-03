@@ -50,6 +50,7 @@ export interface TranscriptSegment {
 
 export interface MediaJob {
   id: string;
+  userId?: string;
   workspaceId: string;
   title: string;
   sourceType: 'file_upload' | 'youtube' | 'gdrive';

@@ -82,7 +82,7 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
 
   const exportToNotionFormat = () => {
     if (!selectedItem) return;
-    const notionMarkdown = `# ${selectedItem.title}\n\n*Created with RepurposeFlow (Google Gemini)*\n\n${selectedItem.content}`;
+    const notionMarkdown = `# ${selectedItem.title}\n\n*Created with RepurposeFlow (Gemini)*\n\n${selectedItem.content}`;
     copyToClipboard(notionMarkdown, 'notion');
   };
 
@@ -404,7 +404,7 @@ export const StudioEditor: React.FC<StudioEditorProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/[0.08] gap-4">
             <div>
               <h2 className="text-lg font-bold text-white">{t.studioViewTranscript}</h2>
-              <p className="text-xs text-slate-400">Google Gemini verbatim transcript</p>
+              <p className="text-xs text-slate-400">Gemini verbatim transcript</p>
             </div>
             <div className="relative">
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />

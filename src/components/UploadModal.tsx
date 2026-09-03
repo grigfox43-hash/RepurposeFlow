@@ -120,6 +120,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: user.id,
           workspaceId: activeWorkspaceId,
           title: title.trim(),
           sourceType: sourceType === 'file' ? 'file_upload' : 'youtube',

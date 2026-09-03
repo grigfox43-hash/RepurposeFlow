@@ -13,7 +13,8 @@ import {
   Layers,
   Sparkles,
   Radio,
-  FileAudio
+  FileAudio,
+  User
 } from 'lucide-react';
 import { MediaJob, UserProfile, Workspace } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
@@ -25,6 +26,7 @@ interface DashboardProps {
   onOpenUpload: () => void;
   onOpenStudio: (job: MediaJob) => void;
   onDeleteJob: (jobId: string) => void;
+  onOpenCabinet: () => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -33,12 +35,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
   jobs,
   onOpenUpload,
   onOpenStudio,
-  onDeleteJob
+  onDeleteJob,
+  onOpenCabinet
 }) => {
   const { t } = useLanguage();
   const [filterQuery, setFilterQuery] = useState('');
 
-  const workspaceJobs = jobs.filter(
+  // Filter jobs by user.id so each user works in their own personal cabinet!
+  const userJobs = jobs.filter(
+    (j) => !j.userId || j.userId === user.id
+  );
+
+  const workspaceJobs = userJobs.filter(
     (j) => !j.workspaceId || j.workspaceId === activeWorkspace.id
   );
 
@@ -58,9 +66,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Workspace Top Banner */}
       <div className="rounded-3xl bg-gradient-to-r from-[#080C14] via-[#0B132B]/50 to-[#080C14] border border-white/[0.08] p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-cyan-400" /> {activeWorkspace.name}
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <button
+              onClick={onOpenCabinet}
+              className="text-xs px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 flex items-center gap-1.5 hover:bg-cyan-500/25 transition"
+            >
+              <User className="w-3.5 h-3.5 text-cyan-400" /> {user.name} ({t.navAccount})
+            </button>
+            <span className="text-xs px-2.5 py-1 rounded-lg bg-white/[0.05] text-slate-300 border border-white/[0.08] flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5 text-slate-400" /> {activeWorkspace.name}
             </span>
             {activeWorkspace.isAgencyClient && (
               <span className="text-xs px-2.5 py-1 rounded-lg bg-purple-900/40 text-purple-300 border border-purple-700/50">
@@ -95,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {Math.max(0, user.minutesTotal - user.minutesUsed)} <span className="text-sm font-normal text-slate-400">/ {user.minutesTotal} мин</span>
           </div>
           <div className="mt-3 text-xs text-cyan-400 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" /> Google Gemini AI
+            <Sparkles className="w-3.5 h-3.5" /> Gemini AI
           </div>
         </div>
 

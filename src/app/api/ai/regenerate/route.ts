@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     if (apiKey) {
       try {
-        const prompt = `Ты — ведущий редактор RepurposeFlow на базе Google Gemini.
+        const prompt = `Ты — ведущий редактор RepurposeFlow на базе Gemini.
 Отредактируй следующий текст публикации в соответствии с инструкцией.
 
 Исходный текст:
@@ -61,7 +61,7 @@ ${originalContent}
     } else if (instruction?.includes('cta') || instruction?.includes('призыв')) {
       modified += `\n\n💬 Напишите в комментариях, какой из пунктов откликается вам больше всего? Отвечу каждому лично!`;
     } else {
-      modified = `✨ [Оптимизировано Google Gemini]\n\n` + modified;
+      modified = `✨ [Оптимизировано Gemini]\n\n` + modified;
     }
 
     return NextResponse.json({ success: true, updatedContent: modified });

@@ -5,10 +5,10 @@ export const translations = {
     // Brand & General
     brandName: 'RepurposeFlow',
     brandTagline: '1 запись ➔ 15 публикаций за 3 мин',
-    poweredBy: 'Google Gemini AI',
+    poweredBy: 'Gemini AI',
     betaTag: 'PROD READY',
     
-    // Navigation
+    // Navigation & Account
     navHome: 'Главная',
     navStudio: 'Студия проектов',
     navRepurposeBtn: 'Переработать запись',
@@ -16,21 +16,35 @@ export const translations = {
     navWorkspaces: 'Воркспейсы',
     navPersonalBrand: 'Личный бренд',
     navClient: 'Клиент',
+    navAccount: 'Личный кабинет',
+    navSwitchAccount: 'Сменить аккаунт',
+    navLogout: 'Выйти',
+
+    // Auth & Cabinet Modal
+    authTitle: 'Личный кабинет эксперта',
+    authSubtitle: 'Индивидуальное рабочее пространство с личной историей задач и балансом',
+    authNameLabel: 'Ваше имя или бренд:',
+    authEmailLabel: 'Электронная почта:',
+    authSaveBtn: 'Сохранить профиль',
+    authSwitchBtn: 'Войти под другим профилем',
+    authStatsHeader: 'Ваша статистика',
+    authStatsJobs: 'Обработано записей:',
+    authStatsMinutes: 'Минут использовано:',
 
     // Hero Section
     heroBadge: 'Интеллектуальная медиа-дистрибуция',
     heroTitlePart1: 'Превратите',
     heroTitleGradient: '1 подкаст или созвон',
     heroTitlePart2: 'в 15 публикаций за 3 минуты',
-    heroSubtitle: 'Передовая платформа на базе Google Gemini для B2B-экспертов, фаундеров, маркетологов и агентств. Загрузите аудио или видео — искусственный интеллект уловит интонации, выделит ключевые инсайты и упакует контент под алгоритмы всех соцсетей.',
+    heroSubtitle: 'Передовая платформа на базе Gemini для B2B-экспертов, фаундеров, маркетологов и агентств. Загрузите аудио или видео — искусственный интеллект уловит интонации, выделит ключевые инсайты и упакует контент под алгоритмы всех соцсетей.',
     heroCtaPrimary: 'Попробовать бесплатно',
-    heroCtaSecondary: 'Смотреть живое демо',
-    heroFeature1: 'Модели Google Gemini с огромным контекстом',
+    heroCtaSecondary: 'Слушать живое демо',
+    heroFeature1: 'Модели Gemini с огромным контекстом',
     heroFeature2: 'Поддержка MP3, WAV, MP4, MOV и YouTube',
     heroFeature3: 'Экспорт в Notion и Google Docs в 1 клик',
 
-    // Interactive Demo
-    demoBadge: 'Интерактивный симулятор переработки',
+    // Interactive Demo & Audio Player
+    demoBadge: 'Интерактивный симулятор переработки (Живой звук)',
     demoTitle: 'Подкаст «Анатомия B2B-контента: от 0 до $100k ARR без рекламы»',
     demoSource: 'Исходник: аудиозапись созвона (32 минуты)',
     demoTabLinkedIn: 'LinkedIn тред (6 слайдов)',
@@ -39,6 +53,8 @@ export const translations = {
     demoTabTelegram: 'Telegram выжимка',
     demoOpenInStudio: 'Открыть в студии',
     demoEditorPrompt: 'Протестируйте полноценный редактор в рабочей студии',
+    demoAudioPlaying: 'Воспроизведение аудио-выпуска...',
+    demoAudioPaused: 'Аудио на паузе. Нажмите Play для прослушивания',
 
     // Bento Features Grid
     featuresTitle: '1 запись ➔ 15 готовых единиц контента',
@@ -70,35 +86,35 @@ export const translations = {
     // FAQ Section
     faqTitle: 'Часто задаваемые вопросы',
     faqSubtitle: 'Всё, что нужно знать о работе RepurposeFlow',
-    faq1Q: 'Почему используется Google Gemini?',
-    faq1A: 'Google Gemini обладает нативной мультимодальностью и беспрецедентным окном контекста. Модель напрямую воспринимает длинные аудио- и видеозаписи, улавливает тончайшие интонации спикеров, выявляет драматургию и не требует грубого разрезания файлов с потерей смысла.',
+    faq1Q: 'Почему используется Gemini?',
+    faq1A: 'Gemini обладает нативной мультимодальностью и беспрецедентным окном контекста. Модель напрямую воспринимает длинные аудио- и видеозаписи, улавливает тончайшие интонации спикеров, выявляет драматургию и не требует грубого разрезания файлов с потерей смысла.',
     faq2Q: 'Какие форматы файлов поддерживаются?',
     faq2A: 'Поддерживаются аудиофайлы MP3, WAV, M4A, AAC, а также видеозаписи MP4 и MOV до 500 МБ. Также доступна прямая вставка ссылок на YouTube и Google Drive.',
     faq3Q: 'Как сохраняются мои проекты?',
-    faq3A: 'Все созданные проекты, аудио-транскрипты и сгенерированные тексты автоматически сохраняются в вашей базе данных и доступны в любой момент в Студии.',
+    faq3A: 'Каждый пользователь работает в своем изолированном личном кабинете. Все созданные проекты, аудио-транскрипты и сгенерированные тексты автоматически сохраняются в вашей базе данных под вашим профилем.',
     faq4Q: 'Можно ли редактировать сгенерированный текст?',
     faq4A: 'Да! Встроенная студия включает Markdown-редактор, инструменты AI-доработки (сократить, усилить хук, добавить CTA) и экспорт в Notion, Google Docs или файл в 1 клик.',
 
     // Dashboard
-    dashTitle: 'Проекты и библиотека контента',
-    dashSubtitle: 'Создавайте новые задачи, редактируйте тексты и экспортируйте материалы.',
+    dashTitle: 'Личный кабинет и библиотека контента',
+    dashSubtitle: 'Индивидуальное пространство: управляйте записями, экспортируйте материалы и отслеживайте дистрибуцию.',
     dashNewProject: 'Новая переработка',
     dashMetricMinutes: 'Остаток минут',
-    dashMetricProjects: 'Всего проектов',
+    dashMetricProjects: 'Мои проекты',
     dashMetricPosts: 'Сгенерировано публикаций',
     dashMetricHours: 'Сэкономлено времени',
-    dashSearchPlaceholder: 'Поиск по проектам...',
+    dashSearchPlaceholder: 'Поиск по моим проектам...',
     dashStatusCompleted: 'Готово',
     dashStatusProcessing: 'В обработке',
     dashOpenStudio: 'В Студию',
-    dashDeleteConfirm: 'Удалить проект?',
-    dashEmptyTitle: 'В вашем пространстве пока нет проектов',
+    dashDeleteConfirm: 'Удалить этот проект из базы данных?',
+    dashEmptyTitle: 'В вашем личном кабинете пока нет проектов',
     dashEmptyDesc: 'Загрузите вашу первую аудиозапись или ссылку на YouTube, чтобы получить 15 публикаций.',
     dashEmptyBtn: 'Загрузить первую запись',
 
     // Upload Modal
     uploadModalTitle: 'Переработка медиа',
-    uploadModalSubtitle: 'Загрузите файл или укажите ссылку для анализа в Google Gemini',
+    uploadModalSubtitle: 'Загрузите файл или укажите ссылку для анализа в Gemini',
     uploadSourceFile: 'Файл (MP3, WAV, MP4, MOV)',
     uploadSourceUrl: 'Ссылка на YouTube',
     uploadDragDropActive: 'Отпустите файл для загрузки',
@@ -127,10 +143,10 @@ export const translations = {
     uploadSubmitting: 'Анализ Gemini...',
 
     // Processing State
-    procTitle: 'Google Gemini перерабатывает запись',
+    procTitle: 'Gemini перерабатывает запись',
     procStep1: 'Загрузка в защищенное облачное хранилище',
     procStep1Desc: 'Проверка целостности и битрейта медиапотока',
-    procStep2: 'Мультимодальный анализ в Google Gemini',
+    procStep2: 'Мультимодальный анализ в Gemini',
     procStep2Desc: 'Определение спикеров, интонаций и смысловых пиков',
     procStep3: 'Извлечение драматургии и таймкодов',
     procStep3Desc: 'Поиск инсайтов, противоречий и вирусных хуков',
@@ -158,10 +174,10 @@ export const translations = {
     studioAiCustomBtn: 'Свой промпт',
     studioAiCustomPlaceholder: 'Например: Перепиши в дерзком стиле...',
     studioAiApply: 'Применить',
-    studioAiProcessing: 'Google Gemini полирует текст...',
+    studioAiProcessing: 'Gemini полирует текст...',
     studioWordsCount: 'слов',
     studioCharsCount: 'символов',
-    studioAutoSaved: 'Сохранено в базе данных',
+    studioAutoSaved: 'Сохранено в личном кабинете (БД)',
     studioTranscriptSearch: 'Поиск по транскрипту...',
 
     // Footer
@@ -169,17 +185,17 @@ export const translations = {
     footerSubtitle: 'Загрузите одну запись и получите 15 качественных публикаций уже через 3 минуты.',
     footerCta: 'Запустить RepurposeFlow сейчас',
     footerRights: 'RepurposeFlow. Все права защищены.',
-    footerTech: 'Google Gemini Multimodal AI • Next.js 15 • Cloudflare R2 • Production'
+    footerTech: 'Gemini Multimodal AI • Next.js 15 • Cloudflare R2 • Production'
   },
 
   en: {
     // Brand & General
     brandName: 'RepurposeFlow',
     brandTagline: '1 recording ➔ 15 social posts in 3 min',
-    poweredBy: 'Google Gemini AI',
+    poweredBy: 'Gemini AI',
     betaTag: 'PROD READY',
 
-    // Navigation
+    // Navigation & Account
     navHome: 'Home',
     navStudio: 'Project Studio',
     navRepurposeBtn: 'Repurpose Media',
@@ -187,21 +203,35 @@ export const translations = {
     navWorkspaces: 'Workspaces',
     navPersonalBrand: 'Personal Brand',
     navClient: 'Client',
+    navAccount: 'Personal Cabinet',
+    navSwitchAccount: 'Switch Account',
+    navLogout: 'Sign Out',
+
+    // Auth & Cabinet Modal
+    authTitle: 'Expert Personal Cabinet',
+    authSubtitle: 'Isolated workspace with your private job history, transcripts and minutes quota',
+    authNameLabel: 'Your Name or Brand:',
+    authEmailLabel: 'Email Address:',
+    authSaveBtn: 'Save Profile',
+    authSwitchBtn: 'Log in as another user',
+    authStatsHeader: 'Your Statistics',
+    authStatsJobs: 'Processed Recordings:',
+    authStatsMinutes: 'Minutes Used:',
 
     // Hero Section
     heroBadge: 'Autonomous Media Distribution',
     heroTitlePart1: 'Turn',
     heroTitleGradient: '1 podcast or client call',
     heroTitlePart2: 'into 15 publish-ready posts in 3 minutes',
-    heroSubtitle: 'Next-generation platform powered by Google Gemini for B2B founders, experts, marketers, and agencies. Upload raw audio or video — our AI extracts emotional peaks, contrarian hooks, and packages content natively for every social platform.',
+    heroSubtitle: 'Next-generation platform powered by Gemini for B2B founders, experts, marketers, and agencies. Upload raw audio or video — our AI extracts emotional peaks, contrarian hooks, and packages content natively for every social platform.',
     heroCtaPrimary: 'Try for Free',
-    heroCtaSecondary: 'Watch Live Demo',
-    heroFeature1: 'Google Gemini huge-context multimodal understanding',
+    heroCtaSecondary: 'Listen to Live Demo',
+    heroFeature1: 'Gemini huge-context multimodal understanding',
     heroFeature2: 'Direct support for MP3, WAV, MP4, MOV & YouTube',
     heroFeature3: '1-click export to Notion & Google Docs',
 
-    // Interactive Demo
-    demoBadge: 'Interactive Repurposing Simulator',
+    // Interactive Demo & Audio Player
+    demoBadge: 'Interactive Repurposing Simulator (Live Audio)',
     demoTitle: 'Podcast: "B2B Content Engine: From 0 to $100k ARR Without Paid Ads"',
     demoSource: 'Source: 32-minute Zoom recording',
     demoTabLinkedIn: 'LinkedIn Thread (6 slides)',
@@ -210,6 +240,8 @@ export const translations = {
     demoTabTelegram: 'Digest & Key Insights',
     demoOpenInStudio: 'Open in Studio',
     demoEditorPrompt: 'Experience the full interactive editor in the workspace studio',
+    demoAudioPlaying: 'Playing live studio audio...',
+    demoAudioPaused: 'Audio paused. Press Play to listen',
 
     // Bento Features Grid
     featuresTitle: '1 Recording ➔ 15 Atomic Content Assets',
@@ -241,35 +273,35 @@ export const translations = {
     // FAQ Section
     faqTitle: 'Frequently Asked Questions',
     faqSubtitle: 'Everything you need to know about RepurposeFlow',
-    faq1Q: 'Why do you use Google Gemini?',
-    faq1A: 'Google Gemini natively processes long multimodal audio and video (up to 2 million tokens of context). It hears speaker intonations, identifies emotional inflection points, and creates deeply contextual social posts without brittle file splitting.',
+    faq1Q: 'Why do you use Gemini?',
+    faq1A: 'Gemini natively processes long multimodal audio and video (up to 2 million tokens of context). It hears speaker intonations, identifies emotional inflection points, and creates deeply contextual social posts without brittle file splitting.',
     faq2Q: 'What file formats are supported?',
     faq2A: 'We support MP3, WAV, M4A, AAC audio files and MP4, MOV video files up to 500 MB. You can also paste direct YouTube and Google Drive links.',
     faq3Q: 'How are my projects stored?',
-    faq3A: 'All your jobs, generated content assets, and transcripts are permanently saved in your database and are immediately accessible in your Studio.',
+    faq3A: 'Every user works in their isolated personal cabinet. All your jobs, transcripts and social posts are automatically saved to your private database partition.',
     faq4Q: 'Can I edit the generated content?',
     faq4A: 'Absolutely! The built-in Studio editor provides a rich Markdown workspace, AI refinement buttons (shorten, strengthen hooks, add CTA), and 1-click export to Notion, Google Docs, or files.',
 
     // Dashboard
-    dashTitle: 'Projects & Content Library',
-    dashSubtitle: 'Manage past recordings, edit articles, and export to social platforms.',
+    dashTitle: 'Personal Cabinet & Content Library',
+    dashSubtitle: 'Private workspace: manage recordings, edit articles, and sync with your database.',
     dashNewProject: 'New Repurposing',
     dashMetricMinutes: 'Minutes Remaining',
-    dashMetricProjects: 'Total Projects',
+    dashMetricProjects: 'My Projects',
     dashMetricPosts: 'Generated Posts',
     dashMetricHours: 'Hours Saved',
-    dashSearchPlaceholder: 'Search projects...',
+    dashSearchPlaceholder: 'Search my projects...',
     dashStatusCompleted: 'Ready',
     dashStatusProcessing: 'Processing',
     dashOpenStudio: 'Open Studio',
-    dashDeleteConfirm: 'Delete project?',
-    dashEmptyTitle: 'No projects in this workspace yet',
+    dashDeleteConfirm: 'Delete this project from your database?',
+    dashEmptyTitle: 'No projects in your personal cabinet yet',
     dashEmptyDesc: 'Upload your first audio or video recording to generate 15 social posts in 3 minutes.',
     dashEmptyBtn: 'Upload First Recording',
 
     // Upload Modal
     uploadModalTitle: 'Repurpose Media',
-    uploadModalSubtitle: 'Upload media or paste link to process with Google Gemini',
+    uploadModalSubtitle: 'Upload media or paste link to process with Gemini',
     uploadSourceFile: 'File (MP3, WAV, MP4, MOV)',
     uploadSourceUrl: 'YouTube URL',
     uploadDragDropActive: 'Drop file here to upload',
@@ -277,7 +309,7 @@ export const translations = {
     uploadDragDropLimits: 'MP3, WAV, M4A, MP4, or MOV up to 500 MB',
     uploadFileSelected: 'File selected:',
     uploadUrlPlaceholder: 'https://www.youtube.com/watch?v=...',
-    uploadUrlHint: 'Audio will be automatically parsed and streamed to Google Gemini',
+    uploadUrlHint: 'Audio will be automatically parsed and streamed to Gemini',
     uploadProjectName: 'Project / Episode Title:',
     uploadProjectNamePlaceholder: 'e.g., Episode 24: B2B Growth Strategies',
     uploadDuration: 'Estimated Duration (min):',
@@ -298,10 +330,10 @@ export const translations = {
     uploadSubmitting: 'Analyzing with Gemini...',
 
     // Processing State
-    procTitle: 'Google Gemini is processing your media',
+    procTitle: 'Gemini is processing your media',
     procStep1: 'Uploading to secure cloud storage',
     procStep1Desc: 'Checking audio integrity and stream metadata',
-    procStep2: 'Multimodal analysis via Google Gemini',
+    procStep2: 'Multimodal analysis via Gemini',
     procStep2Desc: 'Detecting speakers, emotional accents, and key thesis',
     procStep3: 'Extracting narrative flow and timecodes',
     procStep3Desc: 'Pinpointing viral moments, debates, and contrarian insights',
@@ -329,7 +361,7 @@ export const translations = {
     studioAiCustomBtn: 'Custom Prompt',
     studioAiCustomPlaceholder: 'e.g., Rewrite for early-stage founders...',
     studioAiApply: 'Apply',
-    studioAiProcessing: 'Google Gemini is refining the text...',
+    studioAiProcessing: 'Gemini is refining the text...',
     studioWordsCount: 'words',
     studioCharsCount: 'characters',
     studioAutoSaved: 'Synced with database',
@@ -340,6 +372,6 @@ export const translations = {
     footerSubtitle: 'Upload one recording and get 15 high-converting posts in 3 minutes.',
     footerCta: 'Launch RepurposeFlow Now',
     footerRights: 'RepurposeFlow. All rights reserved.',
-    footerTech: 'Google Gemini Multimodal AI • Next.js 15 • Cloudflare R2 • Production'
+    footerTech: 'Gemini Multimodal AI • Next.js 15 • Cloudflare R2 • Production'
   }
 };
