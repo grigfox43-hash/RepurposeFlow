@@ -7,7 +7,6 @@ import {
   Mail,
   Lock,
   Shield,
-  Clock,
   FileAudio,
   Check,
   Plus,
@@ -20,7 +19,7 @@ import {
 } from 'lucide-react';
 import { UserProfile, Workspace } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { createFreshUser } from '@/lib/store';
+import { createFreshUser, loginUser, registerUser } from '@/lib/store';
 import confetti from 'canvas-confetti';
 
 interface PersonalCabinetModalProps {
@@ -40,7 +39,7 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
   onSwitchUser,
   totalUserJobs
 }) => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
 
   // Auth Mode: 'signin' or 'signup'
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
@@ -67,15 +66,8 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
       return;
     }
 
-    const defaultName = authEmail.split('@')[0];
-    const loggedUser: UserProfile = {
-      ...user,
-      email: authEmail.trim(),
-      name: user.name || defaultName.charAt(0).toUpperCase() + defaultName.slice(1),
-      isAuthenticated: true
-    };
-
-    onUpdateUser(loggedUser);
+    const authenticatedUser = loginUser(authEmail.trim());
+    onUpdateUser(authenticatedUser);
     confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
     onClose();
   };
@@ -93,27 +85,9 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
       return;
     }
 
-    const loggedUser: UserProfile = {
-      ...user,
-      name: authName.trim(),
-      email: authEmail.trim(),
-      isAuthenticated: true
-    };
-
-    onUpdateUser(loggedUser);
+    const newUser = registerUser(authName.trim(), authEmail.trim());
+    onUpdateUser(newUser);
     confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
-    onClose();
-  };
-
-  const handleQuickDemoLogin = () => {
-    const demoUser: UserProfile = {
-      ...user,
-      name: language === 'ru' ? 'Эксперт' : 'Expert Founder',
-      email: 'founder@repurposeflow.io',
-      isAuthenticated: true
-    };
-    onUpdateUser(demoUser);
-    confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
     onClose();
   };
 
@@ -158,8 +132,6 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
     setShowAddWorkspace(false);
   };
 
-  const minutesLeft = Math.max(0, user.minutesTotal - user.minutesUsed);
-
   // -------------------------------------------------------------
   // 1. IF NOT LOGGED IN: Render Standard Auth Modal (Вход / Регистрация)
   // -------------------------------------------------------------
@@ -185,7 +157,7 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
             <h2 className="text-xl font-extrabold text-white tracking-tight">
               {authMode === 'signin'
                 ? (language === 'ru' ? 'Вход в личный кабинет' : 'Sign in to RepurposeFlow')
-                : (language === 'ru' ? 'Создать аккаунт' : 'Create an Account')}
+                : (language === 'ru' ? 'Регистрация аккаунта' : 'Create an Account')}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {language === 'ru'
@@ -243,7 +215,7 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
                 </label>
                 <input
                   type="text"
-                  placeholder={language === 'ru' ? 'Иван Иванов' : 'John Doe'}
+                  placeholder={language === 'ru' ? 'Александр' : 'Alexander'}
                   value={authName}
                   onChange={(e) => setAuthName(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white text-xs sm:text-sm focus:outline-none focus:border-cyan-500 transition"
@@ -255,11 +227,11 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-cyan-400" />
-                {language === 'ru' ? 'Рабочий Email' : 'Email Address'}
+                {language === 'ru' ? 'Электронная почта' : 'Email Address'}
               </label>
               <input
                 type="email"
-                placeholder="name@company.com"
+                placeholder="user@example.com"
                 value={authEmail}
                 onChange={(e) => setAuthEmail(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#030712] border border-white/[0.08] text-white text-xs sm:text-sm focus:outline-none focus:border-cyan-500 transition"
@@ -283,37 +255,16 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
 
             <button
               type="submit"
-              className="w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full mt-3 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <span>
                 {authMode === 'signin'
-                  ? (language === 'ru' ? 'Войти в кабинет' : 'Sign In')
-                  : (language === 'ru' ? 'Зарегистрироваться' : 'Create Free Account')}
+                  ? (language === 'ru' ? 'Войти в личный кабинет' : 'Sign In')
+                  : (language === 'ru' ? 'Создать аккаунт' : 'Create Free Account')}
               </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Divider */}
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.08]" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase">
-              <span className="bg-[#080C14] px-3 text-slate-500 font-semibold">
-                {language === 'ru' ? 'или быстрый доступ' : 'or quick access'}
-              </span>
-            </div>
-          </div>
-
-          {/* Quick 1-Click Demo Login */}
-          <button
-            onClick={handleQuickDemoLogin}
-            className="w-full py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-semibold text-slate-200 transition-all hover:border-cyan-500/40 hover:scale-[1.01] active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{language === 'ru' ? '⚡️ Демо-вход в 1 клик' : '⚡️ 1-Click Instant Demo Login'}</span>
-          </button>
         </div>
       </div>
     );
@@ -354,7 +305,7 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
           </button>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - NO minute balance/payment text */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="p-4 rounded-2xl bg-[#030712] border border-white/[0.07]">
             <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
@@ -366,21 +317,20 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
 
           <div className="p-4 rounded-2xl bg-[#030712] border border-white/[0.07]">
             <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
-              <Clock className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{language === 'ru' ? 'Баланс минут' : 'Minutes balance'}</span>
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+              <span>{language === 'ru' ? 'Доступно форматов' : 'Formats available'}</span>
             </div>
-            <div className="text-2xl font-bold text-cyan-400 font-mono">
-              {minutesLeft} <span className="text-xs text-slate-500 font-normal">мин</span>
-            </div>
+            <div className="text-2xl font-bold text-cyan-400 font-mono">15</div>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#030712] border border-white/[0.07]">
             <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mb-1">
               <Shield className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{language === 'ru' ? 'Тарифный план' : 'Subscription'}</span>
+              <span>{language === 'ru' ? 'База данных' : 'Database'}</span>
             </div>
-            <div className="text-sm font-bold text-white uppercase mt-1">
-              {user.plan} <span className="text-[10px] text-emerald-400 font-normal">● Неограничен</span>
+            <div className="text-xs font-bold text-emerald-400 mt-1 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Подключена (Real DB)</span>
             </div>
           </div>
         </div>

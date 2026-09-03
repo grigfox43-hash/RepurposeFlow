@@ -33,6 +33,87 @@ export function createFreshUser(authenticated = false): UserProfile {
   };
 }
 
+export function getStoredAccounts(): UserProfile[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('repurposeflow_accounts');
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveStoredAccount(user: UserProfile) {
+  if (typeof window === 'undefined') return;
+  try {
+    const accounts = getStoredAccounts();
+    const idx = accounts.findIndex((a) => a.email.toLowerCase() === user.email.toLowerCase());
+    if (idx >= 0) {
+      accounts[idx] = user;
+    } else {
+      accounts.push(user);
+    }
+    localStorage.setItem('repurposeflow_accounts', JSON.stringify(accounts));
+  } catch (err) {
+    console.error('Failed to save account:', err);
+  }
+}
+
+export function findAccountByEmail(email: string): UserProfile | null {
+  const accounts = getStoredAccounts();
+  return accounts.find((a) => a.email.toLowerCase() === email.toLowerCase().trim()) || null;
+}
+
+export function registerUser(name: string, email: string): UserProfile {
+  const existing = findAccountByEmail(email);
+  if (existing) {
+    const updated: UserProfile = {
+      ...existing,
+      name: name.trim() || existing.name,
+      isAuthenticated: true
+    };
+    saveStoredAccount(updated);
+    saveStoredUser(updated);
+    return updated;
+  }
+
+  const uid = 'usr-' + Math.random().toString(36).substring(2, 9);
+  const newUser: UserProfile = {
+    id: uid,
+    email: email.trim(),
+    name: name.trim() || email.split('@')[0],
+    avatarUrl: '',
+    plan: 'pro',
+    minutesTotal: 360,
+    minutesUsed: 0,
+    isAuthenticated: true,
+    workspaces: [
+      { id: `ws-${uid.slice(0, 6)}`, name: 'Личный воркспейс', slug: 'my-workspace', isAgencyClient: false, jobsCount: 0 }
+    ],
+    activeWorkspaceId: `ws-${uid.slice(0, 6)}`
+  };
+
+  saveStoredAccount(newUser);
+  saveStoredUser(newUser);
+  return newUser;
+}
+
+export function loginUser(email: string): UserProfile {
+  const existing = findAccountByEmail(email);
+  if (existing) {
+    const loggedIn: UserProfile = {
+      ...existing,
+      isAuthenticated: true
+    };
+    saveStoredAccount(loggedIn);
+    saveStoredUser(loggedIn);
+    return loggedIn;
+  }
+
+  return registerUser('', email);
+}
+
 export function getStoredJobs(): MediaJob[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -72,6 +153,9 @@ export function saveStoredUser(user: UserProfile) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem('repurposeflow_user', JSON.stringify(user));
+    if (user.email) {
+      saveStoredAccount(user);
+    }
   } catch (err) {
     console.error('Failed to persist user:', err);
   }

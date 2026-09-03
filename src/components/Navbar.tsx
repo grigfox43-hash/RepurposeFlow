@@ -187,11 +187,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           )}
 
-          {/* Minute meter */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-slate-300 font-mono font-semibold">{minutesLeft} мин</span>
-          </div>
+          {/* Minute meter - only if authenticated in cabinet */}
+          {user.isAuthenticated && (
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
+              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-slate-300 font-mono font-semibold">{minutesLeft} мин</span>
+            </div>
+          )}
 
           {/* Personal Cabinet OR Login Button */}
           {user.isAuthenticated ? (

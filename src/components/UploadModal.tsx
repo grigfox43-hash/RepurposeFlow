@@ -390,17 +390,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({
             </div>
           </div>
 
-          {/* Minutes quota info */}
-          <div className="p-4 rounded-2xl bg-[#030712] border border-white/[0.07] flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span className="text-slate-300">
-                {t.uploadMinutesChargeNotice} <strong className="text-white font-mono">{estimatedDurationMin} мин</strong>
-              </span>
-            </div>
-            <div className="text-slate-400">
-              Баланс: <span className="font-mono font-bold text-cyan-400">{minutesLeft} мин</span>
-            </div>
+          {/* Processing notice */}
+          <div className="p-3.5 rounded-2xl bg-[#030712] border border-white/[0.07] flex items-center gap-2.5 text-xs text-slate-400">
+            <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 animate-pulse" />
+            <span>Пакетная генерация 15 форматов на базе мультимодального Gemini</span>
           </div>
 
           {/* Buttons */}
