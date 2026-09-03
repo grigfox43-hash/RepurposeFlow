@@ -38,7 +38,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activePreviewTab, setActivePreviewTab] = useState<'linkedin' | 'vc' | 'reels' | 'telegram'>('linkedin');
   const [episodesPerMonth, setEpisodesPerMonth] = useState<number>(4);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [audioSeconds, setAudioSeconds] = useState(0);
   const [copiedPreview, setCopiedPreview] = useState(false);
 
@@ -698,11 +698,11 @@ Gemini processes that raw conversation in 3 minutes:
                   }`}
                 />
               </button>
-              <div className={`faq-content ${openFaq === idx ? 'is-open' : ''}`}>
-                <div className="faq-content-inner px-6 pb-5 text-xs sm:text-sm text-slate-300/90 leading-relaxed border-t border-white/[0.04] pt-3">
+              {openFaq === idx && (
+                <div className="px-6 pb-5 text-xs sm:text-sm text-slate-300/90 leading-relaxed border-t border-white/[0.04] pt-3 animate-fade-in">
                   {item.a}
                 </div>
-              </div>
+              )}
             </div>
           ))}
         </div>
