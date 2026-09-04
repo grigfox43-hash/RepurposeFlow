@@ -15,6 +15,7 @@ import {
 import { FormatType, ToneOfVoice, MediaJob, UserProfile } from '@/types';
 import { FORMAT_DEFINITIONS } from '@/lib/gemini';
 import { useLanguage } from '@/context/LanguageContext';
+import { LegalTabKey } from '@/lib/legalContent';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface UploadModalProps {
   user: UserProfile;
   activeWorkspaceId: string;
   onJobStarted: (job: MediaJob) => void;
+  onOpenLegal?: (tab: LegalTabKey) => void;
 }
 
 const ALL_FORMAT_KEYS = Object.keys(FORMAT_DEFINITIONS) as FormatType[];
@@ -31,7 +33,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   onClose,
   user,
   activeWorkspaceId,
-  onJobStarted
+  onJobStarted,
+  onOpenLegal
 }) => {
   const { t } = useLanguage();
   const [sourceType, setSourceType] = useState<'file' | 'youtube'>('file');
@@ -425,6 +428,13 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           <div className="p-3.5 rounded-2xl bg-[#0A0A12] border border-white/[0.07] flex items-center gap-2.5 text-xs text-[#9A9AB0]">
             <Sparkles className="w-4 h-4 text-[#F15BB5] shrink-0 animate-pulse" />
             <span>Пакетная генерация 15 форматов на базе мультимодального Gemini</span>
+          </div>
+
+          {/* Copyright warranty & AI review disclosure (EU AI Act, FTC, 152-FZ) */}
+          <div className="p-3 rounded-2xl bg-[#0A0A12] border border-white/[0.07] text-[11px] text-slate-400 leading-relaxed text-left">
+            <span>
+              Загружая файл, вы подтверждаете наличие авторских прав или лицензии на обработку записи. Сгенерированные публикации создаются ИИ (Gemini) и требуют вычитки человеком перед публикацией (согласно EU AI Act и FTC 16 CFR).
+            </span>
           </div>
 
           {/* Buttons */}

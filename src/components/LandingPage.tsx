@@ -27,13 +27,15 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { audioEngine } from '@/lib/audioEngine';
+import { LegalTabKey } from '@/lib/legalContent';
 import confetti from 'canvas-confetti';
 
 interface LandingPageProps {
   onStart: () => void;
+  onOpenLegal?: (tab: LegalTabKey) => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onOpenLegal }) => {
   const { t, language } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [activePreviewTab, setActivePreviewTab] = useState<'linkedin' | 'vc' | 'reels' | 'telegram'>('linkedin');
@@ -707,6 +709,21 @@ Gemini processes that raw conversation in 3 minutes:
               <div className="text-[11px] text-slate-500 mt-1">{t.calcReachSub}</div>
             </div>
           </div>
+
+          {/* Legal and Regulatory Disclaimer Footnote */}
+          <div className="mt-8 pt-4 border-t border-white/[0.06] text-center max-w-2xl mx-auto">
+            <p className="text-[11px] text-slate-400 leading-relaxed font-mono">
+              {language === 'ru' ? (
+                <>
+                  ⚠️ Расчет носит информационный оценочный характер, не является публичной офертой (ст. 437 ГК РФ) или гарантией дохода согласно правилам FTC (США) и 38-ФЗ «О рекламе» (РФ). Фактические показатели окупаемости зависят от аудитории, исходного материала и дистрибуционной стратегии.
+                </>
+              ) : (
+                <>
+                  ⚠️ Estimates are illustrative and do not guarantee specific income, audience growth, or time savings pursuant to FTC guidelines (16 CFR Part 255). Not a binding public offer.
+                </>
+              )}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -754,27 +771,151 @@ Gemini processes that raw conversation in 3 minutes:
         </div>
       </section>
 
-      {/* 3.9 Footer with Gradient Shift Text */}
-      <footer className="border-t border-white/[0.06] bg-[#0A0A12]/95 py-14 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden">
-        <div className="max-w-4xl mx-auto relative z-10">
-          <h3 className="gradient-animated-text text-2xl sm:text-4xl font-extrabold tracking-tight">
-            {t.footerTitle}
-          </h3>
-          <p className="mt-2 text-sm text-[#9A9AB0]">
-            {t.footerSubtitle}
-          </p>
-          <div className="mt-8 flex justify-center">
-            <button
-              onClick={onStart}
-              className="btn-primary-effect btn-cta-pulse px-8 py-4 rounded-xl bg-gradient-to-r from-[#4C6EF5] via-[#9B5DE5] to-[#F15BB5] text-white font-bold text-sm shadow-xl shadow-purple-500/25 transition-all"
-            >
-              {t.footerCta}
-            </button>
+      {/* 3.9 Footer with Gradient Shift Text & Multi-Jurisdictional Legal Grid */}
+      <footer className="border-t border-white/[0.08] bg-[#0A0A12]/95 pt-16 pb-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Top Footer Hero Banner */}
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <h3 className="gradient-animated-text text-2xl sm:text-4xl font-extrabold tracking-tight font-heading">
+              {t.footerTitle}
+            </h3>
+            <p className="mt-2 text-sm text-[#9A9AB0]">
+              {t.footerSubtitle}
+            </p>
+            <div className="mt-7 flex justify-center">
+              <button
+                onClick={onStart}
+                className="btn-primary-effect btn-cta-pulse px-8 py-4 rounded-xl bg-gradient-to-r from-[#4C6EF5] via-[#9B5DE5] to-[#F15BB5] text-white font-bold text-sm shadow-xl shadow-purple-500/25 transition-all"
+              >
+                {t.footerCta}
+              </button>
+            </div>
           </div>
-          <div className="mt-12 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>© {new Date().getFullYear()} {t.footerRights}</div>
-            <div className="flex items-center gap-3">
-              <span>{t.footerTech}</span>
+
+          {/* Legal and Compliance Multi-Column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-10 border-y border-white/[0.06] text-left text-xs">
+            {/* Col 1: Platform & DSA Point of Contact */}
+            <div className="md:col-span-2 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-base tracking-tight text-white font-heading">
+                  Repurpose<span className="text-gradient-ai">Flow</span>
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-800/40 font-mono">
+                  Gemini AI Core
+                </span>
+              </div>
+              <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
+                {language === 'ru'
+                  ? 'Мультимодальный облачный программный комплекс для преобразования аудиозаписей и созвонов в 15 форматов дистрибуции контента.'
+                  : 'Enterprise-grade multimodal speech repurposing engine powered by Gemini AI with strict data isolation.'}
+              </p>
+              <div className="space-y-1 pt-1 text-[11px] text-slate-400 font-mono">
+                <div>
+                  <span className="text-slate-400">EU DSA Single Point of Contact: </span>
+                  <a href="mailto:dsa-contact@repurposeflow.com" className="text-[#9B5DE5] hover:underline">
+                    dsa-contact@repurposeflow.com
+                  </a>
+                </div>
+                <div>
+                  <span className="text-slate-400">Data Protection Officer (DPO): </span>
+                  <a href="mailto:privacy@repurposeflow.com" className="text-[#9B5DE5] hover:underline">
+                    privacy@repurposeflow.com
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Col 2: Legal Regulations (RU, EU, US) */}
+            <div className="space-y-2.5">
+              <div className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+                {language === 'ru' ? 'Правовая информация' : 'Legal & Policies'}
+              </div>
+              <ul className="space-y-2 text-slate-400 text-xs">
+                <li>
+                  <button
+                    onClick={() => onOpenLegal?.('privacy')}
+                    className="hover:text-purple-300 transition text-left"
+                  >
+                    {language === 'ru' ? 'Политика конфиденциальности (152-ФЗ, GDPR)' : 'Privacy Policy (GDPR, CCPA)'}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => onOpenLegal?.('terms')}
+                    className="hover:text-purple-300 transition text-left"
+                  >
+                    {language === 'ru' ? 'Пользовательское соглашение (Оферта)' : 'Terms of Service (User Agreement)'}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => onOpenLegal?.('cookies')}
+                    className="hover:text-purple-300 transition text-left"
+                  >
+                    {language === 'ru' ? 'Политика файлов Cookie (ePrivacy)' : 'Cookie Policy (ePrivacy)'}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => onOpenLegal?.('ads_ai')}
+                    className="hover:text-purple-300 transition text-left"
+                  >
+                    {language === 'ru' ? 'Дисклеймер ИИ и 38-ФЗ о рекламе' : 'AI & Advertising Disclosures (FTC)'}
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 3: Compliance & Privacy Controls */}
+            <div className="space-y-2.5">
+              <div className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+                {language === 'ru' ? 'Управление данными' : 'Compliance & Privacy'}
+              </div>
+              <ul className="space-y-2 text-slate-400 text-xs">
+                <li>
+                  <button
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('repurposeflow_open_cookie_settings'));
+                      }
+                    }}
+                    className="text-[#B4FF39] hover:underline transition text-left font-medium"
+                  >
+                    {language === 'ru' ? '⚙️ Настройки Cookie (Consent)' : '⚙️ Cookie Settings'}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => onOpenLegal?.('ccpa')}
+                    className="hover:text-purple-300 transition text-left"
+                  >
+                    {language === 'ru' ? 'Не продавать мои данные (CCPA/CPRA)' : 'Do Not Sell My Info (CCPA)'}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => onOpenLegal?.('impressum')}
+                    className="hover:text-purple-300 transition text-left"
+                  >
+                    {language === 'ru' ? 'Реквизиты и контакты (Impressum)' : 'Legal Notice & Impressum'}
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar: Copyright & Compliance Frameworks */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div>
+              © {new Date().getFullYear()} RepurposeFlow. {language === 'ru' ? 'Все права защищены.' : 'All rights reserved.'}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-mono text-slate-400">
+              <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">152-ФЗ (РФ)</span>
+              <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">38-ФЗ «О рекламе»</span>
+              <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">EU GDPR</span>
+              <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">EU AI Act</span>
+              <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">US CCPA/CPRA</span>
+              <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">FTC 16 CFR</span>
             </div>
           </div>
         </div>

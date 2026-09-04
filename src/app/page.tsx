@@ -9,6 +9,8 @@ import { ProcessingState } from '@/components/ProcessingState';
 import { StudioEditor } from '@/components/StudioEditor';
 import { SettingsModal } from '@/components/SettingsModal';
 import { PersonalCabinetModal } from '@/components/PersonalCabinetModal';
+import { LegalModal } from '@/components/LegalModal';
+import { CookieBanner } from '@/components/CookieBanner';
 import { RedesignEffects } from '@/components/RedesignEffects';
 import { LanguageProvider } from '@/context/LanguageContext';
 import {
@@ -18,6 +20,7 @@ import {
   saveStoredUser
 } from '@/lib/store';
 import { MediaJob, UserProfile } from '@/types';
+import { LegalTabKey } from '@/lib/legalContent';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'studio'>('landing');
@@ -30,6 +33,13 @@ function AppContent() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCabinetOpen, setIsCabinetOpen] = useState(false);
+  const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [legalTab, setLegalTab] = useState<LegalTabKey>('privacy');
+
+  const handleOpenLegal = (tab: LegalTabKey = 'privacy') => {
+    setLegalTab(tab);
+    setIsLegalOpen(true);
+  };
 
   // Load jobs from real database API on mount
   useEffect(() => {
@@ -199,6 +209,7 @@ function AppContent() {
                 }
               });
             }}
+            onOpenLegal={handleOpenLegal}
           />
         )}
 
@@ -246,6 +257,7 @@ function AppContent() {
         user={user}
         activeWorkspaceId={activeWorkspace.id}
         onJobStarted={handleJobStarted}
+        onOpenLegal={handleOpenLegal}
       />
 
       <SettingsModal
@@ -259,7 +271,18 @@ function AppContent() {
         user={user}
         onUpdateUser={handleUpdateUser}
         onSwitchUser={handleSwitchUser}
+        onOpenLegal={handleOpenLegal}
         totalUserJobs={userJobsCount}
+      />
+
+      {/* Global Multi-Jurisdictional Legal Compliance System */}
+      <CookieBanner onOpenLegal={handleOpenLegal} />
+
+      <LegalModal
+        isOpen={isLegalOpen}
+        activeTab={legalTab}
+        onClose={() => setIsLegalOpen(false)}
+        onTabChange={(tab) => setLegalTab(tab)}
       />
     </div>
   );

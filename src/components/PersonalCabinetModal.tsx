@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { UserProfile, Workspace, ToneOfVoice } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
+import { LegalTabKey } from '@/lib/legalContent';
 import {
   loginUser,
   registerUser,
@@ -41,6 +42,7 @@ interface PersonalCabinetModalProps {
   onSelectWorkspace?: (id: string) => void;
   onSignOut?: () => void;
   onSwitchUser?: (newUser: UserProfile) => void;
+  onOpenLegal?: (tab: LegalTabKey) => void;
   totalUserJobs: number;
 }
 
@@ -53,6 +55,7 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
   onSelectWorkspace,
   onSignOut,
   onSwitchUser,
+  onOpenLegal,
   totalUserJobs
 }) => {
   const { language } = useLanguage();
@@ -362,6 +365,49 @@ export const PersonalCabinetModal: React.FC<PersonalCabinetModalProps> = ({
                 onChange={(e) => setAuthPassword(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A12] border border-white/[0.08] text-white text-xs sm:text-sm focus:outline-none focus:border-purple-500 transition-colors"
               />
+            </div>
+
+            {/* Legal consent statement (152-FZ, GDPR, Terms) */}
+            <div className="text-[11px] text-slate-400 leading-relaxed text-left pt-1">
+              {language === 'ru' ? (
+                <>
+                  Нажимая кнопку ниже, вы подтверждаете согласие с{' '}
+                  <button
+                    type="button"
+                    onClick={() => onOpenLegal?.('terms')}
+                    className="text-[#9B5DE5] hover:underline inline"
+                  >
+                    Пользовательским соглашением
+                  </button>{' '}
+                  и даете согласие на обработку персональных данных в соответствии с{' '}
+                  <button
+                    type="button"
+                    onClick={() => onOpenLegal?.('privacy')}
+                    className="text-[#9B5DE5] hover:underline inline"
+                  >
+                    Политикой конфиденциальности (152-ФЗ и GDPR)
+                  </button>.
+                </>
+              ) : (
+                <>
+                  By continuing, you acknowledge and accept our{' '}
+                  <button
+                    type="button"
+                    onClick={() => onOpenLegal?.('terms')}
+                    className="text-[#9B5DE5] hover:underline inline"
+                  >
+                    Terms of Service
+                  </button>{' '}
+                  and consent to data processing under our{' '}
+                  <button
+                    type="button"
+                    onClick={() => onOpenLegal?.('privacy')}
+                    className="text-[#9B5DE5] hover:underline inline"
+                  >
+                    Privacy Policy (GDPR & CCPA)
+                  </button>.
+                </>
+              )}
             </div>
 
             <button
